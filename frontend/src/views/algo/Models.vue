@@ -41,45 +41,6 @@ async function onSwitch(m: ModelConfig) {
 
     <SubTabs />
 
-    <div class="grid grid-cols-3 gap-4 mb-5">
-      <div class="bg-white border border-surface-border rounded-card p-4 card-hover">
-        <div class="flex items-center justify-between">
-          <div>
-            <div class="text-xs text-ink-tertiary">注册模型</div>
-            <div class="text-2xl font-bold text-ink-primary mt-1 font-numeric">{{ modelStore.models.length }}</div>
-          </div>
-          <div class="w-9 h-9 rounded-btn bg-brand-50 flex items-center justify-center text-brand-700">
-            <Icon name="nn" :size="18" />
-          </div>
-        </div>
-        <div class="text-xs text-ink-tertiary mt-2">全部为甘蔗幼苗检测</div>
-      </div>
-      <div class="bg-white border border-surface-border rounded-card p-4 card-hover">
-        <div class="flex items-center justify-between">
-          <div>
-            <div class="text-xs text-ink-tertiary">支持框架</div>
-            <div class="text-2xl font-bold text-ink-primary mt-1 font-numeric">2</div>
-          </div>
-          <div class="w-9 h-9 rounded-btn bg-blue-50 flex items-center justify-center text-blue-600">
-            <Icon name="chip" :size="18" />
-          </div>
-        </div>
-        <div class="text-xs text-ink-tertiary mt-2">Ultralytics · Custom</div>
-      </div>
-      <div class="bg-white border border-surface-border rounded-card p-4 card-hover">
-        <div class="flex items-center justify-between">
-          <div>
-            <div class="text-xs text-ink-tertiary">推理设备</div>
-            <div class="text-2xl font-bold text-ink-primary mt-1 font-numeric">GPU×1</div>
-          </div>
-          <div class="w-9 h-9 rounded-btn bg-purple-50 flex items-center justify-center text-purple-600">
-            <Icon name="augment" :size="18" />
-          </div>
-        </div>
-        <div class="text-xs text-ink-tertiary mt-2">NVIDIA RTX 4060 Ti 16G</div>
-      </div>
-    </div>
-
     <div class="bg-white border border-surface-border rounded-card overflow-hidden">
       <table class="w-full text-sm">
         <thead class="bg-surface-bg text-xs text-ink-secondary">
