@@ -44,6 +44,7 @@ project_root/
 │       ├── components/algo/    # DetectionViewer / HeatmapChart / ConfidenceDistChart
 │       ├── components/common/  # Icon / ImageViewer
 │       └── views/              # index / algo / data / process / dataset
+├── electron/                   # Electron 桌面壳（桌面端唯一方案；产物 gitignore）
 ├── config/models.yaml          # 模型注册配置（6 个甘蔗模型）
 ├── models/                     # YOLO 权重放置目录（需手动放入）
 ├── data/                       # 数据管理 + 处理任务持久化
@@ -51,12 +52,15 @@ project_root/
 │   ├── processing_tasks.yaml   # 处理任务记录
 │   └── sugarcane_20250419_{5m,8m,10m}/   # 原始架次图片
 ├── output/                     # 数据处理产物（output/{task_id}/）
-├── docs/superpowers/           # 设计文档（plans + specs，V2 数据管理 / V3 数据处理）
+├── docs/sdd/                   # 正式 SDD 文档（specs + plans + prd）
+├── reports/                    # 报告交付物（HTML 报告/截图/架构图）
 ├── results/                    # 计数结果输出
 ├── requirements.txt
 ├── start.ps1                   # 一键启动脚本
 └── README.md
 ```
+
+> 私有工作区 `.lqs/`（PRD 草稿/原型/图标设计/bug 与更新报告/AI 分析归档）与 AI 工具目录（`.trae/`、`.codex/` 等）不入库；新文件落位规则见 [AGENTS.md](AGENTS.md)「目录规范」章节。
 
 ## 环境要求
 

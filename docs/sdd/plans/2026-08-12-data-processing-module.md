@@ -8,7 +8,7 @@
 
 **Tech Stack:** Flask 2.2.3、OpenCV 4.7.0.72、Pillow 9.4.0、PyYAML 6.0、Vue 3 + Composition API + Pinia + Axios + Tailwind CSS。
 
-**Spec:** `docs/superpowers/specs/2026-08-12-data-processing-module-design.md`
+**Spec:** `docs/sdd/specs/2026-08-12-data-processing-module-design.md`
 
 ---
 

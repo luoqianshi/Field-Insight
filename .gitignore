@@ -15,13 +15,13 @@ models/*.pt
 models/*.pth
 models/*.onnx
 
-# 运行产物
-results/
+# 运行产物（根锚定，避免误忽略 frontend/src/views/data/ 等同名子目录，R-FS-02）
+/results/
 backend/static/
-output/
-datasets/
-metadata/
-data/
+/output/
+/datasets/
+/metadata/
+/data/
 
 # IDE
 .vscode/
@@ -34,13 +34,19 @@ Thumbs.db
 
 # 私人
 .lqs/
-.trae/
+.trae/*
+!.trae/skills/
 .qwenwork/
 .qoder/
 .workbuddy/
 .codex/
 paper_chapter/*
 remotion/*
+
+# AI 工具分享包 / 截图临时目录 / 根目录日期目录（安全网，规范禁止根目录建日期目录）
+/.trae-html-share-packages/
+/.screenshots/
+/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/
 
 # 日志
 .backend_stderr.log

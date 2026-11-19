@@ -8,7 +8,7 @@
 
 **Tech Stack:** Flask 2.2.3 / PyYAML / Pillow / Vue 3 + Pinia + ECharts + Vite / pytest
 
-**对应设计文档：** `docs/superpowers/specs/2026-08-13-dataset-management-phase1-design.md`
+**对应设计文档：** `docs/sdd/specs/2026-08-13-dataset-management-phase1-design.md`
 
 ---
 
