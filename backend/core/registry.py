@@ -184,10 +184,26 @@ class ModelRegistry:
             self._engines.popitem(last=False)
         return engine
 
+    @staticmethod
+    def _resolve_weight(weight: str) -> str:
+        """权重解析：绝对路径直用；相对路径先查用户数据根，再查只读资源根。"""
+        from pathlib import Path
+        from config import PROJECT_ROOT, RESOURCE_ROOT
+        p = Path(weight)
+        if p.is_absolute():
+            return str(p)
+        user = PROJECT_ROOT / p
+        if user.exists():
+            return str(user)
+        res = RESOURCE_ROOT / p
+        if res.exists():
+            return str(res)
+        return str(user)
+
     def _load_engine(self, name: str):
         """懒加载 YOLO 引擎。测试中通过 patch 此方法规避 ultralytics 依赖。"""
         from ultralytics import YOLO
-        return YOLO(self._configs[name]["weight"])
+        return YOLO(self._resolve_weight(self._configs[name]["weight"]))
 
     @property
     def ready(self) -> bool:

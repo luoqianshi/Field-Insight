@@ -1,0 +1,45 @@
+{
+  "name": "tianjianzhikan-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "田间智瞰 Electron 桌面壳（可行性验证）",
+  "author": "luoqianshi",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "smoke": "electron . --smoke",
+    "build:dir": "electron-builder --win --x64 --dir"
+  },
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.luoqianshi.tianjianzhikan",
+    "productName": "TianJianZhiKan",
+    "directories": {
+      "output": "dist"
+    },
+    "electronDownload": {
+      "mirror": "https://npmmirror.com/mirrors/electron/"
+    },
+    "publish": null,
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "backend-dist/TianJianZhiKanBackend",
+        "to": "backend"
+      }
+    ],
+    "win": {
+      "target": [
+        "dir"
+      ],
+      "icon": "build/app.ico"
+    }
+  }
+}

@@ -173,7 +173,7 @@ def pick_folder():
         import tkinter as tk
         from tkinter import filedialog
     except ImportError:
-        return _error("当前环境未安装 tkinter，请手动输入路径", 500)
+        return _error("桌面端未能加载系统对话框组件，请直接在输入框粘贴数据集目录路径", 500)
     try:
         root = tk.Tk()
         root.withdraw()
