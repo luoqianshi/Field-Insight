@@ -1,0 +1,7 @@
+# Electron 构建产物（不纳入版本控制）
+node_modules/
+dist/
+backend-dist/
+backend-build/
+.cache/
+*.log
