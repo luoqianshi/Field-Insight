@@ -1,11 +1,14 @@
 // Electron 主进程（可行性验证用）
 // 职责：单实例 → 拉起纯后端 → 解析端口 → 载入本地页面 → 退出时回收子进程树
-const { app, BrowserWindow, dialog, nativeImage } = require('electron');
+const { app, BrowserWindow, dialog, nativeImage, Menu } = require('electron');
 const { spawn, spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const http = require('http');
+
+// 去掉 Electron 默认的 File/Edit/View/Window/Help 菜单栏（Windows/Linux 整行隐藏）
+Menu.setApplicationMenu(null);
 
 const T0 = Date.now();
 const isSmoke = process.argv.includes('--smoke');
