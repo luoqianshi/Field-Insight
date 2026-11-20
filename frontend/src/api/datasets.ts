@@ -1,4 +1,5 @@
 import client from './client'
+import { nativePickFolder } from './desktop'
 
 export type DatasetFormat = 'YOLO' | 'COCO' | 'VOC'
 export type DatasetSource = 'imported' | 'built'
@@ -105,5 +106,9 @@ export const datasetsApi = {
       `/datasets/${id}/images`, { params }),
   delete: (id: string, deleteFiles = false) =>
     client.delete<unknown, { data: null }>(`/datasets/${id}`, { params: { delete_files: deleteFiles } }),
-  pickFolder: () => client.post<unknown, { data: { path?: string; cancelled?: boolean } }>('/datasets/pick-folder'),
+  pickFolder: async () => {
+    const native = await nativePickFolder()
+    if (native) return { data: { cancelled: native.cancelled, path: native.path ?? undefined } }
+    return client.post<unknown, { data: { path?: string; cancelled?: boolean } }>('/datasets/pick-folder')
+  },
 }

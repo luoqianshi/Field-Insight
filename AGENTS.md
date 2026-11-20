@@ -24,7 +24,7 @@
 | `paper_chapter/` `remotion/` | 论文/视频大文件工作区 | 忽略 |
 | `.lqs/` | 私有工作区：PRD 草稿/原型/图标设计/bug 与更新报告/AI 分析归档 | 忽略 |
 | `.trae/` `.codex/` `.qoder/` `.workbuddy/` | AI 工具自有 scratch 目录，内部不手动迁移 | 忽略（`.trae/skills/` 除外） |
-| 根文件 | README / AGENTS / DEPLOYMENT / start.ps1 / requirements*.txt | 跟踪 |
+| 根文件 | README / AGENTS / LOG / start.ps1 / requirements*.txt | 跟踪 |
 
 ### 新文件落位规则
 
@@ -39,7 +39,7 @@
 ### Git 卫生
 
 - `.gitignore` 运行目录必须根锚定（`/data/` 而非 `data/`），防止误忽略 `frontend/src/views/data/` 等同名子目录（R-FS-02）。
-- 禁止跟踪：日志、分享 zip、大图片/gif、模型权重、运行数据、私有草稿。
+- 禁止跟踪：运行日志、分享 zip、大图片/gif、模型权重、运行数据、私有草稿（根 `LOG.md` 为改动日志文档，属跟踪例外，见「改动日志」章节）。
 - 提交前 `git status --porcelain` 冻结范围、精确 add（见下方 Git 工作流）。
 
 ## 常用命令（Windows / PowerShell）
@@ -64,6 +64,13 @@ npm run build
 # 后端测试（在 backend/ 目录下执行）
 cd backend
 python -m pytest -v
+
+# 桌面端（Electron，细则见「桌面端研发细则」章节）
+cd frontend; npm run build                # 载荷前置：backend/static/index.html
+powershell -NoProfile -ExecutionPolicy Bypass -File electron\build-backend.ps1 -PythonExe <构建环境 python.exe>
+cd electron; npm install; npm start       # 开发运行（加载 backend-dist 载荷）
+npm run smoke                             # 冒烟测试
+npm run build:dir                         # → dist/win-unpacked 便携目录
 ```
 
 ## 代码约定
@@ -73,6 +80,59 @@ python -m pytest -v
 - 前端使用浅色主题，主色 Emerald `#10B981`，Gradio 风格极简布局；禁止玻璃拟态、霓虹光效、脉冲动画；图标用 SVG（stroke-width=1.5），不用 emoji。
 - 不修改 `backend/api/` 既有路由文件的签名；新增接口优先新增文件或扩展 Blueprint。
 - 提交信息遵循 Conventional Commits：`feat|fix|docs|style|refactor|perf|test|build|ci|chore(scope): 描述`，描述可用中文，使用现在时祈使语气。
+
+## 改动日志（LOG.md，强制）
+
+根 `LOG.md` 是仓库级 AI 操作改动日志，用于快速 Review「之前做过哪些改动」。
+
+- **触发**：任何 AI 工具（TRAE/Codex/Qoder/WorkBuddy 等）在本仓库产生文件改动（代码/配置/文档/构建脚本）的任务，完成后必须向 `LOG.md` 追加一行日志。纯只读问答、调研、规划且未落盘任何文件改动的会话不记录。
+- **格式**：`- [YYYY-MM-DD HH:mm] type(scope): 一句话摘要`。时间为任务完成时的本地时间（Asia/Shanghai）；type 遵循 Conventional Commits；摘要 ≤50 字，说清「改了什么」，可附关键文件/模块名。
+- **粒度**：每个用户任务一条；同一任务内多次编辑、多个提交合并为一条，不按文件逐条记录。
+- **写入**：追加到文件末尾（时间正序）；历史条目不改不删，纠错以新条目说明。
+- **Git**：`LOG.md` 纳入版本控制（属改动文档而非运行日志），与该任务改动一并提交。
+- **与其他记录的关系**：commit message 是提交级明细，`.lqs/update_report/` 是详细归档，LOG.md 是任务级一行索引，三者互补不互替。
+
+## 桌面端研发细则（Electron）
+
+桌面端唯一方案为 Electron（2026-11-19 定案，PyWebView 过渡方案废弃）。Web/桌面共享 `backend/` 与 `frontend/`，以 FROZEN 门控区分形态；修改共享代码时必须同时考虑两态行为。
+
+### 结构与进程编排契约
+- 壳源码：`electron/main.js`（编排/冒烟/`tjzk:pick-folder` 原生目录选择 IPC）、`preload.js`（只读 `window.tjzk` 环境信息 + `pickFolder` 桥）、`desktop_backend.py`（纯后端入口）、`desktop_backend.spec`（PyInstaller onedir 载荷）、`build-backend.ps1`（载荷重建）、`build/app.ico`（桌面图标）。
+- 编排链（修改 main.js / desktop_backend.py 时必须同步维护）：单实例锁 → spawn 后端 exe `--port 0` → 解析 stdout 协议 `BACKEND_PORT <port>` / `BACKEND_READY` → 载入 `http://127.0.0.1:<port>`；60 秒就绪超时。
+- 退出回收：stdin 看门狗（父进程死亡后端自动退出）+ `taskkill /PID <pid> /T /F` 兜底，杜绝孤儿进程。
+- 窗口：1440×900（min 1100×760），标题「田间智瞰」；`Menu.setApplicationMenu(null)` 隐藏默认菜单栏；contextIsolation=true、nodeIntegration=false。
+- 后端 exe 查找：打包态 `resources/backend/TianJianZhiKanBackend.exe`，开发态 `electron/backend-dist/TianJianZhiKanBackend/`。
+
+### FROZEN 双根配置（backend/config.py）
+- `FROZEN = sys.frozen`；RESOURCE_ROOT（只读：backend/static、config 模板、内置权重，PyInstaller `_MEIPASS`）与 PROJECT_ROOT（可写数据根）分离。
+- 冻结态可写数据根固定 `%LOCALAPPDATA%\TianJianZhiKan\`（config/models/data/output/datasets/results/logs），与安装位置解耦；**严禁删除该目录**，卸载不删历史数据。
+- 非冻结态必须与 Web 开发行为完全一致（锚定仓库根）；新增运行目录一律走 config.py 常量，禁止硬编码路径。
+- 冻结态 HOST=127.0.0.1、DEBUG=False；首启把内置 `models.yaml` 播种到用户目录（仅缺失时）。
+- `desktop_backend.py` 的 `_MEIPASS`/`sys.frozen` 兼容垫片（部分 onedir 产物属性缺失）不得删除。
+
+### 构建链与环境
+- 顺序：`cd frontend; npm run build`（`backend/static/index.html` 必须存在）→ `electron\build-backend.ps1 -PythonExe <构建环境 python.exe>` → `cd electron; npm install; npm start`（开发）/ `npm run build:dir`（便携目录）。
+- 构建环境：Python 3.8.20（conda uav-vis）+ `venv --system-site-packages` + pyinstaller==6.22.3 + torch==2.1.0+cpu / torchvision==0.16.1+cpu / torchaudio==2.1.0+cpu；脚本默认 PythonExe 指向已删除的旧 venv，必须显式传入。
+- 发行必须 CPU 版 torch（CUDA 版约 4.2GB 不可分发，CPU 版载荷约 900MB）。
+- spec 要点：SPECPATH 锚定仓库根（与 cwd 无关）；`pathex` 必须含 `backend/`（裸导入依赖 sys.path 补丁，静态分析识别不到）；datas 收集 backend/static、config、models；excludes 排除 webview/tkinter 等 GUI 模块（Electron 版故意排除，目录选择不依赖 tkinter）。
+- 模型权重加载保持两级回退（打包资源目录 → 开发相对路径），不得改成单一路径。
+
+### 验证
+- `npm run smoke`：自动 health/models/单图推理 + 耗时/内存报告（`TJZK_SMOKE_OUT` 指定输出路径，默认 `%TEMP%\tjzk-electron-smoke.json`；`TJZK_LOG` 开启主进程文件日志）。
+- 后端改动仍须 `cd backend; python -m pytest -v`；前端改动后必须重新 build 再重建载荷。
+
+### 发布约定
+- 版本单一来源：`electron/package.json` 的 `version`；git tag `vX.Y.Z`（注解 tag）与之对齐。
+- 仅发布 Windows 压缩包 `TianJianZhiKan-v{version}-win-x64.zip`；`dist/win-unpacked` 是免安装原材料，整目录压缩，不逐个挑 exe。
+- `publish: null` 手动发布、无自动更新；zip target/artifactName 配置已规划未实施（见 `.lqs/update_report/012`）；NSIS 配置（向导式/自定义目录/当前用户）存在但非当前发布形态。
+- 未代码签名：SmartScreen「未知发布者」属预期，Release notes 须写明「更多信息 → 仍要运行」。
+- 流程：冻结验证（pytest/build/smoke）→ 版本提交 → 重建产物链 → 干净目录解压验证 + SHA256 → 注解 tag → 按 Git 工作流走代理推送 → `gh release create` 上传 zip + sha256。
+
+### 环境与操作禁忌
+- D:\ 根目录有写保护：构建/安装输出放用户目录、`%TEMP%` 或项目外 build 目录；中间产物不得污染仓库根。
+- 清理操作不得强杀开发环境进程；被占用文件报告并跳过；不得用吞错误的执行方式；删除走回收站（Remove-Item 受限时用 Microsoft.VisualBasic FileIO SendToRecycleBin），并逐个核实路径真实删除。
+- electron-builder rcedit 写图标会撞 Windows Defender 实时扫描文件锁，需延时重试（约 8 秒/次、最多 15 次）；exe 图标显示异常先刷新图标缓存（`ie4uinit.exe -show`）。
+- `electron/` 产物（node_modules/dist/backend-dist/backend-build/.cache/*.log）全部 gitignore，不得跟踪。
 
 ## Git 工作流（强制：默认走本地系统代理）
 

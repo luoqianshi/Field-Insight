@@ -1,6 +1,6 @@
 // Electron 主进程（可行性验证用）
 // 职责：单实例 → 拉起纯后端 → 解析端口 → 载入本地页面 → 退出时回收子进程树
-const { app, BrowserWindow, dialog, nativeImage, Menu } = require('electron');
+const { app, BrowserWindow, dialog, nativeImage, Menu, ipcMain } = require('electron');
 const { spawn, spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -221,6 +221,14 @@ async function runSmoke(port) {
   killBackendTree();
   setTimeout(() => app.quit(), 300);
 }
+
+// 原生文件夹选择对话框：冻结载荷排除 tkinter，桌面态目录选择走 OS 对话框（Web 态仍走后端通道）
+ipcMain.handle('tjzk:pick-folder', async () => {
+  const options = { title: '选择文件夹', properties: ['openDirectory'] };
+  const result = win ? await dialog.showOpenDialog(win, options) : await dialog.showOpenDialog(options);
+  const picked = result.filePaths && result.filePaths[0];
+  return { cancelled: result.canceled, path: picked ? picked.replace(/\\/g, '/') : null };
+});
 
 app.on('second-instance', () => {
   if (win) {

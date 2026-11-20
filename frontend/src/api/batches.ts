@@ -1,4 +1,5 @@
 import client from './client'
+import { nativePickFolder } from './desktop'
 
 export interface Batch {
   batch_id: string
@@ -90,6 +91,9 @@ export const batchesApi = {
   scanPath: (image_folder_path: string) =>
     client.post<unknown, { data: ScanResult }>('/batches/scan', { image_folder_path }),
 
-  pickFolder: () =>
-    client.post<unknown, { data: { cancelled?: boolean; path?: string } }>('/batches/pick-folder', {}),
+  pickFolder: async () => {
+    const native = await nativePickFolder()
+    if (native) return { data: { cancelled: native.cancelled, path: native.path ?? undefined } }
+    return client.post<unknown, { data: { cancelled?: boolean; path?: string } }>('/batches/pick-folder', {})
+  },
 }
