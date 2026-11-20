@@ -41,6 +41,11 @@
         "dir"
       ],
       "icon": "build/app.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false
     }
   }
 }
