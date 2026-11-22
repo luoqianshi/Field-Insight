@@ -4,7 +4,6 @@
 所有响应遵循统一信封：{"success": bool, "data": <data>|None, "message": str}。
 """
 import sys
-from pathlib import Path
 
 from flask import Blueprint, jsonify, request
 
@@ -178,18 +177,10 @@ def pick_folder():
 @settings_bp.route("/api/settings/about", methods=["GET"])
 def about():
     """GET /api/settings/about → 轻量关于信息（F14）。"""
-    version = None
-    if not config.FROZEN:
-        # 版本单一来源 electron/package.json（开发态可读；冻结态不收集该文件）
-        try:
-            import json
-            pkg = Path(config.DEFAULT_ROOT) / "electron" / "package.json"
-            version = json.loads(pkg.read_text(encoding="utf-8")).get("version")
-        except Exception:
-            version = None
+    # 版本单一来源：config.APP_VERSION（桌面冻结态由 Electron 壳经环境变量透传）
     return _ok({
         "app": "田间智瞰",
-        "version": version,
+        "version": config.APP_VERSION,
         "mode": "desktop" if config.FROZEN else "web",
         "data_root": str(config.PROJECT_ROOT),
         "python": sys.version.split()[0],

@@ -179,9 +179,10 @@ npm install
 npm start                              # 开发运行（加载 backend-dist 载荷）
 npm run smoke                          # 冒烟测试（health/models/单图推理 + 耗时/内存报告）
 npm run build:dir                      # electron-builder 打包 → dist/win-unpacked 便携目录
+npm run build:installer                # NSIS 向导式安装包 → dist/TianJianZhiKan-v{version}-win-x64-setup.exe
 ```
 
-桌面端运行时数据统一写入 `%LOCALAPPDATA%\TianJianZhiKan\`（config/models/data/output/datasets/results/logs），与安装目录解耦；`models.yaml` 首次启动自动播种。
+桌面端运行时数据统一写入 `%LOCALAPPDATA%\TianJianZhiKan\`（config/models/data/output/datasets/results/logs），与安装目录解耦；`models.yaml` 首次启动自动播种。安装包默认当前用户级安装、支持自定义目录、创建桌面/开始菜单快捷方式、卸载保留业务数据；完整构建与验证说明见 [docs/desktop-build-guide.md](docs/desktop-build-guide.md)。
 
 ### 方式四：GitHub Pages 静态演示
 
@@ -404,10 +405,10 @@ datasets/
 ## 后续阶段
 
 - **V4 第二阶段**：数据集构建/拆分/多格式导出（前端「新建数据集」已预留双 tab，构建入口暂禁用）。
-- **桌面端**：当前为 `--dir` 便携目录形态，NSIS 安装包与自动更新尚未配置。
+- **桌面端**：已提供 NSIS 向导式安装包（v1.1.0 起），自动更新尚未配置；构建与安装说明见 [docs/desktop-build-guide.md](docs/desktop-build-guide.md)。
 
 ## 相关文档
 
 - [AGENTS.md](AGENTS.md) —— AI 编码代理项目指引（目录规范/代码约定/Git 工作流）
-- [DEPLOYMENT.md](DEPLOYMENT.md) —— 线上部署指南（Docker/Nginx/HTTPS/CI-CD/监控备份）
+- [docs/desktop-build-guide.md](docs/desktop-build-guide.md) —— 桌面端构建、安装包生成与验证说明
 - [docs/sdd/](docs/sdd/) —— 正式 SDD 文档（数据管理/数据处理/数据集管理 specs + plans）

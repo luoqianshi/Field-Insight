@@ -9,6 +9,7 @@ Electron 桌面端双根配置（FROZEN 门控，非冻结态与 Web 开发行�
 - 锚点 data_root 为合法绝对路径且可达 → 覆盖 PROJECT_ROOT；否则回退默认根并记录 ROOT_FALLBACK_WARNING
 - 各模块在导入时捕获路径常量，故自定义根在「迁移 + 重启后端」后生效
 """
+import json
 import os
 import shutil
 import sys
@@ -34,6 +35,21 @@ def _default_root() -> Path:
 
 RESOURCE_ROOT = _resource_root()
 DEFAULT_ROOT = _default_root()
+
+
+def _app_version() -> str:
+    """应用版本单一来源 electron/package.json；桌面冻结态由壳经环境变量透传。"""
+    env_version = os.environ.get("TJZK_APP_VERSION")
+    if env_version:
+        return env_version
+    try:
+        pkg = Path(__file__).resolve().parent.parent / "electron" / "package.json"
+        return json.loads(pkg.read_text(encoding="utf-8")).get("version") or "1.0.0"
+    except Exception:
+        return "1.0.0"
+
+
+APP_VERSION = _app_version()
 
 # 锚点文件：始终留守默认根（KB 级），不随业务数据迁移
 ANCHOR_PATH = DEFAULT_ROOT / ("settings.yaml" if FROZEN else "settings.local.yaml")

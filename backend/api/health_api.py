@@ -1,6 +1,7 @@
 """健康检查 API：GET /api/health。"""
 from flask import Blueprint, jsonify
 
+import config
 from core.engine import get_detector, get_registry
 
 health_bp = Blueprint("health", __name__)
@@ -16,7 +17,7 @@ def health():
         "success": True,
         "data": {
             "status": "ok",
-            "version": "v1.0.0",
+            "version": "v" + config.APP_VERSION,
             "detector_ready": detector is not None,
             "registry_ready": registry_ready,
             "current_model": active,

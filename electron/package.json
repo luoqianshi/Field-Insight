@@ -1,8 +1,8 @@
 {
   "name": "tianjianzhikan-desktop",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
-  "description": "田间智瞰 Electron 桌面壳（可行性验证）",
+  "description": "田间智瞰 Electron 桌面壳（含设置模块）",
   "author": "luoqianshi",
   "main": "main.js",
   "scripts": {
@@ -38,14 +38,26 @@
     ],
     "win": {
       "target": [
-        "dir"
+        "nsis"
       ],
       "icon": "build/app.ico"
     },
     "nsis": {
       "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
       "allowToChangeInstallationDirectory": true,
-      "perMachine": false
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "menuCategory": false,
+      "shortcutName": "田间智瞰",
+      "uninstallDisplayName": "田间智瞰",
+      "deleteAppDataOnUninstall": false,
+      "runAfterFinish": true,
+      "artifactName": "TianJianZhiKan-v${version}-win-x64-setup.${ext}",
+      "installerIcon": "build/app.ico",
+      "uninstallerIcon": "build/app.ico",
+      "installerHeaderIcon": "build/app.ico"
     }
   }
 }

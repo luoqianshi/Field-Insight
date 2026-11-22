@@ -1,6 +1,6 @@
 // Electron 主进程（可行性验证用）
 // 职责：单实例 → 拉起纯后端 → 解析端口 → 载入本地页面 → 退出时回收子进程树
-const { app, BrowserWindow, dialog, nativeImage, Menu, ipcMain } = require('electron');
+const { app, BrowserWindow, dialog, nativeImage, Menu, ipcMain, screen } = require('electron');
 const { spawn, spawnSync } = require('child_process');
 const path = require('path');
 const fs = require('fs');
@@ -58,6 +58,8 @@ function startBackend() {
     backendProc = spawn(exe, ['--port', '0'], {
       stdio: ['pipe', 'pipe', 'pipe'],
       windowsHide: true,
+      // 冻结态后端读不到 electron/package.json，由壳把版本号透传给「设置 → 关于」
+      env: { ...process.env, TJZK_APP_VERSION: app.getVersion() },
     });
     dbg('backend spawn pid=' + backendProc.pid + ' exe=' + exe);
     timings.backend_spawn_ms = Date.now() - T0;
@@ -268,18 +270,31 @@ app.whenReady().then(async () => {
   try {
     const port = await startBackend();
     timings.window_created_ms = Date.now() - T0;
+    // 按主显示器工作区自适应：1920×1080 → 1440×900；1366×768 笔记本 → 约 1286×648，避免窗口超出屏幕
+    const area = screen.getPrimaryDisplay().workAreaSize;
+    const width = Math.max(1024, Math.min(1440, area.width - 80));
+    const height = Math.max(620, Math.min(900, area.height - 80));
     win = new BrowserWindow({
-      width: 1440,
-      height: 900,
-      minWidth: 1100,
-      minHeight: 760,
+      width,
+      height,
+      minWidth: 1024,
+      minHeight: 620,
+      center: true,
       show: false,
       title: '田间智瞰',
+      backgroundColor: '#F9FAFB',
       webPreferences: {
         preload: path.join(__dirname, 'preload.js'),
         contextIsolation: true,
         nodeIntegration: false,
       },
+    });
+    // 无菜单栏形态下补全 F11 全屏切换（Windows 习惯键位）
+    win.webContents.on('before-input-event', (event, input) => {
+      if (input.type === 'keyDown' && input.key === 'F11') {
+        win.setFullScreen(!win.isFullScreen());
+        event.preventDefault();
+      }
     });
     win.once('ready-to-show', () => {
       win.show();

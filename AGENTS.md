@@ -71,6 +71,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File electron\build-backend.ps1 -
 cd electron; npm install; npm start       # 开发运行（加载 backend-dist 载荷）
 npm run smoke                             # 冒烟测试
 npm run build:dir                         # → dist/win-unpacked 便携目录
+npm run build:installer                   # → dist/TianJianZhiKan-v{version}-win-x64-setup.exe 安装包
 ```
 
 ## 代码约定
@@ -111,7 +112,7 @@ npm run build:dir                         # → dist/win-unpacked 便携目录
 - `desktop_backend.py` 的 `_MEIPASS`/`sys.frozen` 兼容垫片（部分 onedir 产物属性缺失）不得删除。
 
 ### 构建链与环境
-- 顺序：`cd frontend; npm run build`（`backend/static/index.html` 必须存在）→ `electron\build-backend.ps1 -PythonExe <构建环境 python.exe>` → `cd electron; npm install; npm start`（开发）/ `npm run build:dir`（便携目录）。
+- 顺序：`cd frontend; npm run build`（`backend/static/index.html` 必须存在）→ `electron\build-backend.ps1 -PythonExe <构建环境 python.exe>` → `cd electron; npm install; npm start`（开发）/ `npm run build:dir`（便携目录）/ `npm run build:installer`（NSIS 安装包）。
 - 构建环境：Python 3.8.20（conda uav-vis）+ `venv --system-site-packages` + pyinstaller==6.22.3 + torch==2.1.0+cpu / torchvision==0.16.1+cpu / torchaudio==2.1.0+cpu；脚本默认 PythonExe 指向已删除的旧 venv，必须显式传入。
 - 发行必须 CPU 版 torch（CUDA 版约 4.2GB 不可分发，CPU 版载荷约 900MB）。
 - spec 要点：SPECPATH 锚定仓库根（与 cwd 无关）；`pathex` 必须含 `backend/`（裸导入依赖 sys.path 补丁，静态分析识别不到）；datas 收集 backend/static、config、models；excludes 排除 webview/tkinter 等 GUI 模块（Electron 版故意排除，目录选择不依赖 tkinter）。
@@ -124,7 +125,7 @@ npm run build:dir                         # → dist/win-unpacked 便携目录
 ### 发布约定
 - 版本单一来源：`electron/package.json` 的 `version`；git tag `vX.Y.Z`（注解 tag）与之对齐。
 - 仅发布 Windows 压缩包 `TianJianZhiKan-v{version}-win-x64.zip`；`dist/win-unpacked` 是免安装原材料，整目录压缩，不逐个挑 exe。
-- `publish: null` 手动发布、无自动更新；zip target/artifactName 配置已规划未实施（见 `.lqs/update_report/012`）；NSIS 配置（向导式/自定义目录/当前用户）存在但非当前发布形态。
+- `publish: null` 手动发布、无自动更新；zip target/artifactName 配置已规划未实施（见 `.lqs/update_report/012`）；NSIS 安装包（向导式/自定义目录/当前用户/桌面与开始菜单快捷方式）自 v1.1.0 起可用 `npm run build:installer` 产出，验证与构建说明见 [docs/desktop-build-guide.md](docs/desktop-build-guide.md)。
 - 未代码签名：SmartScreen「未知发布者」属预期，Release notes 须写明「更多信息 → 仍要运行」。
 - 流程：冻结验证（pytest/build/smoke）→ 版本提交 → 重建产物链 → 干净目录解压验证 + SHA256 → 注解 tag → 按 Git 工作流走代理推送 → `gh release create` 上传 zip + sha256。
 
