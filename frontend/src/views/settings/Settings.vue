@@ -165,7 +165,7 @@ function onMigrated() {
 
 <template>
   <AppLayout>
-    <div class="max-w-5xl">
+    <div>
       <!-- 页头 -->
       <div class="mb-5">
         <div class="text-xs text-ink-tertiary mb-1">系统</div>
@@ -225,8 +225,10 @@ function onMigrated() {
         </div>
       </div>
 
+      <!-- 主体：宽屏左右两栏（存储 2/3 + 磁盘/关于 1/3），窄屏纵向堆叠 -->
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
       <!-- 数据存储 -->
-      <div class="bg-white border border-surface-border rounded-card shadow-card mb-4">
+      <div class="xl:col-span-2 bg-white border border-surface-border rounded-card shadow-card">
         <div class="flex items-center justify-between px-5 py-4 border-b border-surface-border">
           <div class="flex items-center gap-2">
             <Icon name="hard-drive" :size="18" class="text-brand-700" />
@@ -257,27 +259,14 @@ function onMigrated() {
           <div v-if="store.error" class="text-sm text-red-600">{{ store.error }}</div>
 
           <template v-if="ov">
-            <!-- 当前根 + 磁盘 -->
+            <!-- 当前根 -->
             <div>
               <div class="text-xs text-ink-tertiary mb-1">当前数据根目录</div>
               <div class="font-mono text-sm text-ink-primary break-all">{{ ov.active_root }}</div>
-              <div class="mt-2.5">
-                <div class="flex justify-between text-xs text-ink-secondary mb-1 font-numeric">
-                  <span>磁盘占用 {{ diskPercent }}%</span>
-                  <span>剩余 {{ fmtBytes(ov.disk.free) }} / {{ fmtBytes(ov.disk.total) }}</span>
-                </div>
-                <div class="h-1.5 bg-surface-hover rounded-full overflow-hidden">
-                  <div
-                    class="h-full rounded-full transition-all duration-200"
-                    :class="diskCritical ? 'bg-amber-500' : 'bg-brand-300'"
-                    :style="{ width: diskPercent + '%' }"
-                  ></div>
-                </div>
-              </div>
             </div>
 
             <!-- 模块目录卡片 -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-3 gap-3">
               <div
                 v-for="m in ov.modules"
                 :key="m.key"
@@ -315,30 +304,77 @@ function onMigrated() {
         </div>
       </div>
 
-      <!-- 关于 -->
-      <div class="bg-white border border-surface-border rounded-card shadow-card">
-        <div class="flex items-center gap-2 px-5 py-4 border-b border-surface-border">
-          <Icon name="info" :size="18" class="text-brand-700" />
-          <span class="font-semibold text-ink-primary">关于</span>
+      <!-- 右栏：磁盘占用 + 关于 -->
+      <div class="space-y-4">
+        <!-- 磁盘占用 -->
+        <div class="bg-white border border-surface-border rounded-card shadow-card">
+          <div class="flex items-center gap-2 px-5 py-4 border-b border-surface-border">
+            <Icon name="gauge" :size="18" class="text-brand-700" />
+            <span class="font-semibold text-ink-primary">磁盘占用</span>
+          </div>
+          <div class="px-5 py-4">
+            <template v-if="ov">
+              <div class="flex items-baseline justify-between mb-2">
+                <span
+                  class="text-3xl font-bold font-numeric tracking-tight"
+                  :class="diskCritical ? 'text-amber-500' : 'text-ink-primary'"
+                >{{ diskPercent }}<span class="text-base font-semibold ml-0.5">%</span></span>
+                <span class="text-xs text-ink-tertiary">已用容量占比</span>
+              </div>
+              <div class="h-2 bg-surface-hover rounded-full overflow-hidden mb-4">
+                <div
+                  class="h-full rounded-full transition-all duration-200"
+                  :class="diskCritical ? 'bg-amber-500' : 'bg-brand-300'"
+                  :style="{ width: diskPercent + '%' }"
+                ></div>
+              </div>
+              <div class="space-y-2 text-sm">
+                <div class="flex justify-between gap-4">
+                  <span class="text-ink-tertiary">已用</span>
+                  <span class="text-ink-primary font-numeric">{{ fmtBytes(ov.disk.used) }}</span>
+                </div>
+                <div class="flex justify-between gap-4">
+                  <span class="text-ink-tertiary">剩余</span>
+                  <span class="text-ink-primary font-numeric">{{ fmtBytes(ov.disk.free) }}</span>
+                </div>
+                <div class="flex justify-between gap-4">
+                  <span class="text-ink-tertiary">总容量</span>
+                  <span class="text-ink-primary font-numeric">{{ fmtBytes(ov.disk.total) }}</span>
+                </div>
+              </div>
+            </template>
+            <div v-else class="text-sm text-ink-secondary flex items-center gap-2">
+              <Icon name="spinner" :size="14" spin /> 正在读取磁盘信息…
+            </div>
+          </div>
         </div>
-        <div class="px-5 py-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-2.5 text-sm">
-          <div class="flex justify-between gap-4">
-            <span class="text-ink-tertiary">应用名称</span>
-            <span class="text-ink-primary font-medium">{{ store.about?.app || '田间智瞰' }}</span>
+
+        <!-- 关于 -->
+        <div class="bg-white border border-surface-border rounded-card shadow-card">
+          <div class="flex items-center gap-2 px-5 py-4 border-b border-surface-border">
+            <Icon name="info" :size="18" class="text-brand-700" />
+            <span class="font-semibold text-ink-primary">关于</span>
           </div>
-          <div class="flex justify-between gap-4">
-            <span class="text-ink-tertiary">版本</span>
-            <span class="text-ink-primary font-numeric">{{ store.about?.version || '—' }}</span>
-          </div>
-          <div class="flex justify-between gap-4">
-            <span class="text-ink-tertiary">运行形态</span>
-            <span class="text-ink-primary">{{ store.about?.mode === 'desktop' ? '桌面端（Electron）' : 'Web' }}</span>
-          </div>
-          <div class="flex justify-between gap-4">
-            <span class="text-ink-tertiary">Python</span>
-            <span class="text-ink-primary font-numeric">{{ store.about?.python || '—' }}</span>
+          <div class="px-5 py-4 space-y-2.5 text-sm">
+            <div class="flex justify-between gap-4">
+              <span class="text-ink-tertiary">应用名称</span>
+              <span class="text-ink-primary font-medium">{{ store.about?.app || '田间智瞰' }}</span>
+            </div>
+            <div class="flex justify-between gap-4">
+              <span class="text-ink-tertiary">版本</span>
+              <span class="text-ink-primary font-numeric">{{ store.about?.version || '—' }}</span>
+            </div>
+            <div class="flex justify-between gap-4">
+              <span class="text-ink-tertiary">运行形态</span>
+              <span class="text-ink-primary">{{ store.about?.mode === 'desktop' ? '桌面端（Electron）' : 'Web' }}</span>
+            </div>
+            <div class="flex justify-between gap-4">
+              <span class="text-ink-tertiary">Python</span>
+              <span class="text-ink-primary font-numeric">{{ store.about?.python || '—' }}</span>
+            </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
 
