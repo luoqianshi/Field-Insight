@@ -3,11 +3,18 @@
 Electron 桌面端双根配置（FROZEN 门控，非冻结态与 Web 开发行为一致）：
 - RESOURCE_ROOT：只读资源（backend/static、config 模板、内置权重）
 - PROJECT_ROOT：可写数据根（data/output/datasets/results/config）
+
+存储位置自定义（设置模块，docs/sdd/plans/2026-11-20-settings-storage-migration.md）：
+- 锚点文件永不随数据迁移：冻结态 DEFAULT_ROOT/settings.yaml，非冻结态 DEFAULT_ROOT/settings.local.yaml
+- 锚点 data_root 为合法绝对路径且可达 → 覆盖 PROJECT_ROOT；否则回退默认根并记录 ROOT_FALLBACK_WARNING
+- 各模块在导入时捕获路径常量，故自定义根在「迁移 + 重启后端」后生效
 """
 import os
 import shutil
 import sys
 from pathlib import Path
+
+import yaml
 
 FROZEN = getattr(sys, "frozen", False)
 
@@ -18,7 +25,7 @@ def _resource_root() -> Path:
     return Path(__file__).resolve().parent.parent
 
 
-def _user_root() -> Path:
+def _default_root() -> Path:
     if not FROZEN:
         return Path(__file__).resolve().parent.parent
     base = os.environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
@@ -26,11 +33,61 @@ def _user_root() -> Path:
 
 
 RESOURCE_ROOT = _resource_root()
+DEFAULT_ROOT = _default_root()
+
+# 锚点文件：始终留守默认根（KB 级），不随业务数据迁移
+ANCHOR_PATH = DEFAULT_ROOT / ("settings.yaml" if FROZEN else "settings.local.yaml")
+
+ROOT_FALLBACK_WARNING = None  # 自定义根不可达/损坏时的警告（供设置 API 暴露）
+CONFIGURED_ROOT = None        # 启动时锚点 data_root 原始值（None = 默认）
+
+
+def _load_anchor_root():
+    """读取锚点 data_root；损坏/非法时返回 None 并记录警告。"""
+    global ROOT_FALLBACK_WARNING, CONFIGURED_ROOT
+    if not ANCHOR_PATH.is_file():
+        return None
+    try:
+        data = yaml.safe_load(ANCHOR_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        ROOT_FALLBACK_WARNING = "存储配置损坏，已恢复默认位置"
+        return None
+    raw = data.get("data_root") if isinstance(data, dict) else None
+    if raw is None or not str(raw).strip():
+        return None
+    CONFIGURED_ROOT = str(raw).strip()
+    p = Path(CONFIGURED_ROOT)
+    if not p.is_absolute():
+        ROOT_FALLBACK_WARNING = "存储配置路径非法，已恢复默认位置"
+        return None
+    return p
+
+
+def _user_root() -> Path:
+    global ROOT_FALLBACK_WARNING
+    configured = _load_anchor_root()
+    if configured is None:
+        return DEFAULT_ROOT
+    try:
+        if configured.is_dir():
+            return configured
+        anchor = configured.anchor
+        if anchor and not Path(anchor).exists():
+            ROOT_FALLBACK_WARNING = f"自定义数据位置不可达（{configured}），已临时使用默认位置"
+        else:
+            ROOT_FALLBACK_WARNING = f"自定义数据目录不存在（{configured}），已临时使用默认位置"
+    except OSError:
+        ROOT_FALLBACK_WARNING = f"自定义数据位置不可达（{configured}），已临时使用默认位置"
+    return DEFAULT_ROOT
+
+
 PROJECT_ROOT = _user_root()
+ACTIVE_ROOT = PROJECT_ROOT  # 本进程实际生效根（与锚点比对判定 pending_restart）
 
 BACKEND_DIR = RESOURCE_ROOT / "backend"
 MODELS_DIR = PROJECT_ROOT / "models"
-CONFIG_DIR = PROJECT_ROOT / "config"
+# config/ 特例（决策 D5）：非冻结态为 git 跟踪的模板目录（RESOURCE_ROOT==PROJECT_ROOT），不随数据根迁移
+CONFIG_DIR = (PROJECT_ROOT / "config") if FROZEN else (DEFAULT_ROOT / "config")
 RESULTS_DIR = PROJECT_ROOT / "results"
 MOCK_DIR = BACKEND_DIR / "mock"
 MOCK_IMAGES_DIR = RESOURCE_ROOT / "mock"

@@ -34,7 +34,7 @@ def test_load_from_yaml_and_list_models(tmp_path):
         default_model="yolov8s",
     )
 
-    registry = ModelRegistry(yaml_path)
+    registry = ModelRegistry(yaml_path, str(tmp_path / "models"))
     registry.load_from_yaml()
 
     models = registry.list_models()
@@ -60,7 +60,7 @@ def test_switch_and_get_engine(tmp_path):
         default_model="yolov8n",
     )
 
-    registry = ModelRegistry(yaml_path)
+    registry = ModelRegistry(yaml_path, str(tmp_path / "models"))
     registry.load_from_yaml()
     assert registry.get_active() == "yolov8n"
 
@@ -83,7 +83,7 @@ def test_register_sets_active_when_none(tmp_path):
         models=[{"name": "yolov8n", "display_name": "YOLOv8n", "weight": "w1.pt"}],
     )
 
-    registry = ModelRegistry(yaml_path)
+    registry = ModelRegistry(yaml_path, str(tmp_path / "models"))
     # 未加载 YAML 前，无激活模型
     assert registry.get_active() is None
     assert registry.ready is False
@@ -104,7 +104,7 @@ def test_register_keeps_existing_active(tmp_path):
         default_model="yolov8n",
     )
 
-    registry = ModelRegistry(yaml_path)
+    registry = ModelRegistry(yaml_path, str(tmp_path / "models"))
     registry.load_from_yaml()
     assert registry.get_active() == "yolov8n"
 
@@ -127,7 +127,7 @@ def test_lru_eviction(tmp_path):
         ],
     )
 
-    registry = ModelRegistry(yaml_path, lru_size=2)
+    registry = ModelRegistry(yaml_path, str(tmp_path / "models"), lru_size=2)
     registry.load_from_yaml()
 
     def fake_load(name):
@@ -160,7 +160,7 @@ def test_lru_move_to_end_on_access(tmp_path):
         ],
     )
 
-    registry = ModelRegistry(yaml_path, lru_size=2)
+    registry = ModelRegistry(yaml_path, str(tmp_path / "models"), lru_size=2)
     registry.load_from_yaml()
 
     def fake_load(name):
@@ -190,7 +190,7 @@ def test_get_config_unknown_raises_keyerror(tmp_path):
         default_model="yolov8n",
     )
 
-    registry = ModelRegistry(yaml_path)
+    registry = ModelRegistry(yaml_path, str(tmp_path / "models"))
     registry.load_from_yaml()
 
     with pytest.raises(KeyError):
@@ -204,7 +204,7 @@ def test_switch_unknown_raises_keyerror(tmp_path):
         default_model="yolov8n",
     )
 
-    registry = ModelRegistry(yaml_path)
+    registry = ModelRegistry(yaml_path, str(tmp_path / "models"))
     registry.load_from_yaml()
 
     with pytest.raises(KeyError):
@@ -217,7 +217,7 @@ def test_get_engine_without_active_raises_runtimeerror(tmp_path):
         models=[{"name": "yolov8n", "display_name": "YOLOv8n", "weight": "w1.pt"}],
     )
 
-    registry = ModelRegistry(yaml_path)
+    registry = ModelRegistry(yaml_path, str(tmp_path / "models"))
     # 未加载，无激活模型
     with pytest.raises(RuntimeError):
         registry.get_engine()

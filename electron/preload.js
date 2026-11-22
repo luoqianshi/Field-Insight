@@ -10,4 +10,6 @@ contextBridge.exposeInMainWorld('tjzk', {
   },
   // 桌面态目录选择：主进程 dialog.showOpenDialog，返回 { cancelled, path }
   pickFolder: () => ipcRenderer.invoke('tjzk:pick-folder'),
+  // 存储迁移后重启后端：主进程杀旧进程树并重新拉起，按新端口重载原路由
+  restartBackend: () => ipcRenderer.invoke('tjzk:restart-backend'),
 });

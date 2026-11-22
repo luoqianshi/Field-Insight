@@ -29,6 +29,7 @@ let backendProc = null;
 let backendPort = null;
 let win = null;
 let quitting = false;
+let restarting = false; // 存储迁移后主动重启后端期间，抑制「意外退出」报错
 const timings = {};
 
 if (!app.requestSingleInstanceLock()) {
@@ -88,7 +89,7 @@ function startBackend() {
     backendProc.on('error', (err) => finish(err));
     backendProc.on('exit', (code, sig) => {
       timings.backend_exit = { code, sig };
-      if (!quitting) {
+      if (!quitting && !restarting) {
         finish(new Error(`后端进程意外退出（code=${code}, signal=${sig}）`));
         if (win) {
           dialog.showErrorBox('后端已停止', '内置服务异常退出，请重启应用。\n退出码：' + code);
@@ -228,6 +229,31 @@ ipcMain.handle('tjzk:pick-folder', async () => {
   const result = win ? await dialog.showOpenDialog(win, options) : await dialog.showOpenDialog(options);
   const picked = result.filePaths && result.filePaths[0];
   return { cancelled: result.canceled, path: picked ? picked.replace(/\\/g, '/') : null };
+});
+
+// 存储迁移完成后重启后端：杀旧进程树 → 重新拉起 → 按新端口重载原路由
+ipcMain.handle('tjzk:restart-backend', async () => {
+  if (restarting) return { success: false, message: '正在重启中' };
+  restarting = true;
+  dbg('restart-backend requested');
+  try {
+    let oldPath = '/';
+    try {
+      const u = new URL(win.webContents.getURL());
+      oldPath = u.pathname + u.search + u.hash;
+    } catch (_) {}
+    killBackendTree();
+    const port = await startBackend();
+    if (win) await win.loadURL(`http://127.0.0.1:${port}${oldPath}`);
+    dbg('restart-backend done port=' + port + ' path=' + oldPath);
+    return { success: true };
+  } catch (e) {
+    dbg('restart-backend failed: ' + (e && e.stack ? e.stack : e));
+    dialog.showErrorBox('服务重启失败', '数据位置已切换，但服务重启失败，请重启应用。\n' + String(e && e.message ? e.message : e));
+    return { success: false, message: String(e && e.message ? e.message : e) };
+  } finally {
+    restarting = false;
+  }
 });
 
 app.on('second-instance', () => {

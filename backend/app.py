@@ -21,6 +21,7 @@ from api.counting_api import counting_bp  # noqa: E402
 from api.batches_api import batches_bp  # noqa: E402
 from api.processing_api import processing_bp  # noqa: E402
 from api.datasets_api import datasets_bp  # noqa: E402
+from api.settings_api import settings_bp  # noqa: E402
 from config import STATIC_DIR, HOST, PORT, DEBUG  # noqa: E402
 
 
@@ -53,6 +54,7 @@ def create_app() -> Flask:
     app.register_blueprint(batches_bp)
     app.register_blueprint(processing_bp)
     app.register_blueprint(datasets_bp)
+    app.register_blueprint(settings_bp)
 
     # 全局错误兜底：未捕获异常统一返回 JSON 信封，避免前端收到 HTML 500
     @app.errorhandler(Exception)

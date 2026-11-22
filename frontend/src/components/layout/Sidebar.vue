@@ -17,6 +17,7 @@ const navItems = [
   { to: '/process/tasks', label: '数据处理', icon: 'augment', section: 'process' },
   { to: '/dataset/datasets', label: '数据集管理', icon: 'database', section: 'dataset' },
   { to: '/algo/models', label: '算法广场', icon: 'chip', section: 'algo' },
+  { to: '/settings', label: '设置', icon: 'gear', section: 'settings' },
 ]
 
 function isActive(section: string): boolean {

@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 
-// 15 条路由，对应 V0.4 原型全部页面
+// 16 条路由，对应 V0.4 原型全部页面 + 设置模块
 const routes = [
   { path: '/', name: 'index', component: () => import('@/views/index/Index.vue') },
 
@@ -27,6 +27,9 @@ const routes = [
   { path: '/algo/model-register', name: 'model-register', component: () => import('@/views/algo/ModelRegister.vue') },
   { path: '/algo/detect', name: 'detect', component: () => import('@/views/algo/Detect.vue') },
   { path: '/algo/counting', name: 'counting', component: () => import('@/views/algo/Counting.vue') },
+
+  // 设置
+  { path: '/settings', name: 'settings', component: () => import('@/views/settings/Settings.vue') },
 ]
 
 const router = createRouter({

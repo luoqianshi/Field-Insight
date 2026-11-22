@@ -22,6 +22,8 @@ backend/static/
 /datasets/
 /metadata/
 /data/
+/settings.local.yaml
+/migration_pending.json
 
 # IDE
 .vscode/

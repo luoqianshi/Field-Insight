@@ -59,7 +59,8 @@ def test_models_list(client):
     body = resp.get_json()
     assert body["success"] is True
     data = body["data"]
-    assert len(data["models"]) == 4
+    # 真实 models.yaml 会随用户注册增长，仅断言不少于初始 4 个模型
+    assert len(data["models"]) >= 4
     assert data["current_model"] == "yolov8s-sugarcane"
     by_name = {m["name"]: m for m in data["models"]}
     assert by_name["yolov8s-sugarcane"]["is_active"] is True

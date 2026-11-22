@@ -92,6 +92,10 @@ const icons: Record<string, string> = {
 
   // 状态
   check: '<path d="M5 12 L10 17 L19 7"/>',
+  'check-circle': '<circle cx="12" cy="12" r="8.6"/><path d="M8.4 12.3 L10.9 14.8 L15.6 9.6"/>',
+  'x-circle': '<circle cx="12" cy="12" r="8.6"/><path d="M9.4 9.4 L14.6 14.6"/><path d="M14.6 9.4 L9.4 14.6"/>',
+  'hard-drive': '<path d="M4.5 13 L6.4 6.2 A1.6 1.6 0 0 1 7.9 5 H16.1 A1.6 1.6 0 0 1 17.6 6.2 L19.5 13"/><rect x="4.5" y="13" width="15" height="6" rx="1.6"/><circle cx="8.2" cy="16" r="1" fill="currentColor" stroke="none"/><path d="M12 16 H16"/>',
+  refresh: '<path d="M19.6 12 A7.6 7.6 0 1 1 17.3 6.6"/><path d="M17.8 3.6 V6.9 H14.5"/>',
   image: '<rect x="3.5" y="4.5" width="17" height="15" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M20.5 15.5 L16 11 L9 18 L4.5 14.5"/>',
 
   // 检测按钮和bolt
