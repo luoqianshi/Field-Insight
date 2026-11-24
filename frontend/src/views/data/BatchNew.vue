@@ -2,6 +2,7 @@
 import AppLayout from '@/components/layout/AppLayout.vue'
 import DataSubTabs from '@/components/layout/DataSubTabs.vue'
 import Icon from '@/components/common/Icon.vue'
+import GeoLocationEditor, { type GeoValue } from '@/components/data/GeoLocationEditor.vue'
 import { batchesApi } from '@/api/batches'
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -24,6 +25,7 @@ const form = ref({
 const imagePath = ref('')
 const overlapFront = ref(0.8)
 const overlapSide = ref(0.7)
+const geo = ref<GeoValue>({ latitude: null, longitude: null, altitude_m: null, geo_source: '' })
 
 const submitting = ref(false)
 const scanning = ref(false)
@@ -171,6 +173,10 @@ async function submit() {
       image_folder_path: imagePath.value,
       overlap_front: overlapFront.value,
       overlap_side: overlapSide.value,
+      latitude: geo.value.latitude ?? undefined,
+      longitude: geo.value.longitude ?? undefined,
+      altitude_m: geo.value.altitude_m ?? undefined,
+      geo_source: geo.value.geo_source ?? undefined,
     })
     if (isOtherDrone.value) persistCustomDrone(effectiveDroneModel.value)
     successMsg.value = '架次登记成功'
@@ -191,6 +197,7 @@ function resetForm() {
     plot_name: '', drone_model: 'DJI Mavic 3 M', flight_altitude_m: 5, description: '',
   }
   imagePath.value = ''
+  geo.value = { latitude: null, longitude: null, altitude_m: null, geo_source: '' }
   customDroneModel.value = ''
   overlapFront.value = 0.8
   overlapSide.value = 0.7
@@ -274,8 +281,8 @@ function formatBytes(bytes: number): string {
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-medium text-ink-primary mb-1.5">地块名称</label>
-                <input v-model="form.plot_name" type="text" placeholder="如：A区" class="w-full px-3 py-2 bg-white border border-surface-border rounded-btn text-sm" />
+                <label class="block text-xs font-medium text-ink-primary mb-1.5">位置名称</label>
+                <input v-model="form.plot_name" type="text" placeholder="如：A区 / 甘蔗东地块" class="w-full px-3 py-2 bg-white border border-surface-border rounded-btn text-sm" />
               </div>
               <div>
                 <label class="block text-xs font-medium text-ink-primary mb-1.5">飞行高度（米）</label>
@@ -284,6 +291,10 @@ function formatBytes(bytes: number): string {
                   <span class="text-xs text-ink-tertiary">m</span>
                 </div>
               </div>
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-ink-primary mb-1.5">地理位置信息</label>
+              <GeoLocationEditor v-model="geo" :folder-path="imagePath" />
             </div>
           </div>
         </div>
@@ -375,7 +386,8 @@ function formatBytes(bytes: number): string {
             <div class="flex justify-between"><span class="text-ink-tertiary">架次名称</span><span class="text-ink-primary font-medium">{{ form.batch_name || '—' }}</span></div>
             <div class="flex justify-between"><span class="text-ink-tertiary">作物类型</span><span class="text-ink-primary">{{ form.crop_type }}</span></div>
             <div class="flex justify-between"><span class="text-ink-tertiary">采集日期</span><span class="text-ink-primary">{{ form.flight_date || '—' }}</span></div>
-            <div class="flex justify-between"><span class="text-ink-tertiary">地块名称</span><span class="text-ink-primary">{{ form.plot_name || '—' }}</span></div>
+            <div class="flex justify-between"><span class="text-ink-tertiary">位置名称</span><span class="text-ink-primary">{{ form.plot_name || '—' }}</span></div>
+            <div class="flex justify-between gap-2"><span class="text-ink-tertiary flex-shrink-0">地理坐标</span><span class="text-ink-primary font-mono text-[11px] text-right break-all">{{ geo.latitude != null && geo.longitude != null ? `${Number(geo.latitude).toFixed(6)}, ${Number(geo.longitude).toFixed(6)}` : '—' }}</span></div>
             <div class="flex justify-between"><span class="text-ink-tertiary">飞行高度</span><span class="text-ink-primary">{{ form.flight_altitude_m }} m</span></div>
             <div class="flex justify-between"><span class="text-ink-tertiary">机型</span><span class="text-ink-primary">{{ effectiveDroneModel || '—' }}</span></div>
             <div class="flex justify-between"><span class="text-ink-tertiary">航向/旁向</span><span class="text-ink-primary">{{ overlapFront }} / {{ overlapSide }}</span></div>

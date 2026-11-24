@@ -259,3 +259,89 @@ def test_scan_path_nonexistent(tmp_path):
 
     result = registry.scan_path(str(tmp_path / "no_such_dir"))
     assert result["valid"] is False
+
+
+def test_create_batch_with_geo_fields(tmp_path):
+    """地理位置字段：创建时写入 WGS84 经纬度/海拔/来源。"""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    ext_dir = tmp_path / "ext_geo"
+    ext_dir.mkdir()
+    _make_test_image(ext_dir, "t.jpg")
+
+    yaml_path = tmp_path / "batches.yaml"
+    registry = BatchRegistry(data_dir=data_dir, yaml_path=yaml_path)
+    registry.load_from_yaml()
+    cfg = registry.create_batch({
+        "batch_name": "geo_batch",
+        "crop_type": "甘蔗",
+        "flight_date": "2026-08-10",
+        "image_folder_path": str(ext_dir),
+        "latitude": "23.1370389",
+        "longitude": 113.2638889,
+        "altitude_m": 152.5,
+        "geo_source": "image_exif",
+    })
+    assert cfg["latitude"] == pytest.approx(23.1370389)
+    assert cfg["longitude"] == pytest.approx(113.2638889)
+    assert cfg["altitude_m"] == pytest.approx(152.5)
+    assert cfg["geo_source"] == "image_exif"
+
+
+def test_create_batch_invalid_geo(tmp_path):
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    ext_dir = tmp_path / "ext_bad_geo"
+    ext_dir.mkdir()
+    _make_test_image(ext_dir, "t.jpg")
+
+    yaml_path = tmp_path / "batches.yaml"
+    registry = BatchRegistry(data_dir=data_dir, yaml_path=yaml_path)
+    registry.load_from_yaml()
+    with pytest.raises(ValueError, match="纬度超出范围"):
+        registry.create_batch({
+            "batch_name": "bad_geo",
+            "crop_type": "甘蔗",
+            "flight_date": "2026-08-10",
+            "image_folder_path": str(ext_dir),
+            "latitude": 91,
+            "longitude": 113,
+        })
+    with pytest.raises(ValueError, match="成对"):
+        registry.create_batch({
+            "batch_name": "bad_geo2",
+            "crop_type": "甘蔗",
+            "flight_date": "2026-08-10",
+            "image_folder_path": str(ext_dir),
+            "latitude": 23,
+        })
+
+
+def test_update_batch_geo_clear(tmp_path):
+    """更新地理位置：可覆盖，也可传 None 清除。"""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    ext_dir = tmp_path / "ext_geo_upd"
+    ext_dir.mkdir()
+    _make_test_image(ext_dir, "t.jpg")
+
+    yaml_path = tmp_path / "batches.yaml"
+    registry = BatchRegistry(data_dir=data_dir, yaml_path=yaml_path)
+    registry.load_from_yaml()
+    cfg = registry.create_batch({
+        "batch_name": "geo_upd",
+        "crop_type": "甘蔗",
+        "flight_date": "2026-08-10",
+        "image_folder_path": str(ext_dir),
+        "latitude": 23.1,
+        "longitude": 113.2,
+        "geo_source": "map_pick",
+    })
+    updated = registry.update_batch(cfg["batch_id"], {"latitude": 22.5, "longitude": 113.5, "geo_source": "image_exif"})
+    assert updated["latitude"] == pytest.approx(22.5)
+    assert updated["geo_source"] == "image_exif"
+
+    cleared = registry.update_batch(cfg["batch_id"], {"latitude": None, "longitude": None, "geo_source": ""})
+    assert cleared["latitude"] is None
+    assert cleared["longitude"] is None
+    assert cleared["geo_source"] == ""

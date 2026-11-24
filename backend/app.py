@@ -19,6 +19,7 @@ from api.models_api import models_bp  # noqa: E402
 from api.detect_api import detect_bp  # noqa: E402
 from api.counting_api import counting_bp  # noqa: E402
 from api.batches_api import batches_bp  # noqa: E402
+from api.geo_api import geo_bp  # noqa: E402
 from api.processing_api import processing_bp  # noqa: E402
 from api.datasets_api import datasets_bp  # noqa: E402
 from api.settings_api import settings_bp  # noqa: E402
@@ -52,6 +53,7 @@ def create_app() -> Flask:
     app.register_blueprint(detect_bp)
     app.register_blueprint(counting_bp)
     app.register_blueprint(batches_bp)
+    app.register_blueprint(geo_bp)
     app.register_blueprint(processing_bp)
     app.register_blueprint(datasets_bp)
     app.register_blueprint(settings_bp)

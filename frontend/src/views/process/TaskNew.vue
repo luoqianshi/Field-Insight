@@ -332,7 +332,7 @@ onMounted(async () => {
                         />
                       </th>
                       <th class="text-left py-2 px-3 font-medium">架次名称</th>
-                      <th class="text-left py-2 px-3 font-medium">作物 / 地块</th>
+                      <th class="text-left py-2 px-3 font-medium">作物 / 位置</th>
                       <th class="text-right py-2 px-3 font-medium">原图数</th>
                       <th class="text-right py-2 px-3 font-medium">采集高度</th>
                     </tr>

@@ -101,6 +101,8 @@ const icons: Record<string, string> = {
   // 检测按钮和bolt
   'cloud-arrow-up': '<path d="M12 15 V7"/><path d="M9 10 L12 7 L15 10"/><path d="M7 18 A4 4 0 0 1 7 10 A5 5 0 0 1 17 10 A4 4 0 0 1 17 18 Z"/>',
   search: '<circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 L21 21"/>',
+  'map-pin': '<path d="M12 21 C12 21 5.5 14.6 5.5 10 A6.5 6.5 0 0 1 18.5 10 C18.5 14.6 12 21 12 21 Z"/><circle cx="12" cy="10" r="2.4"/>',
+  globe: '<circle cx="12" cy="12" r="9"/><path d="M3 12 H21"/><path d="M12 3 C15 6.2 15 17.8 12 21 C9 17.8 9 6.2 12 3 Z"/>',
 }
 </script>
 

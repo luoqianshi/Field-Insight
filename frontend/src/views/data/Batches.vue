@@ -33,6 +33,11 @@ const totalSizeGb = computed(() =>
 const resolutionLabel = computed(() => summary.value.resolutions[0] || '-')
 const formatsLabel = computed(() => summary.value.formats.join('、') || '-')
 
+function geoText(b: Batch): string {
+  if (typeof b.latitude !== 'number' || typeof b.longitude !== 'number') return ''
+  return `${b.latitude.toFixed(4)}, ${b.longitude.toFixed(4)}`
+}
+
 function statusBadge(status: string): { cls: string; label: string } {
   const s = (status || '').toLowerCase()
   if (s.includes('process') || s.includes('进行') || s.includes('run'))
@@ -57,7 +62,8 @@ async function applyFilters() {
       list = list.filter(
         (b) =>
           b.batch_name.toLowerCase().includes(q) ||
-          (b.plot_name || '').toLowerCase().includes(q),
+          (b.plot_name || '').toLowerCase().includes(q) ||
+          geoText(b).includes(q),
       )
     }
     batches.value = list
@@ -149,7 +155,7 @@ function goDetail(b: Batch) {
           <input
             v-model="searchName"
             type="text"
-            placeholder="架次名称 / 地块"
+            placeholder="架次名称 / 位置"
             class="w-full pl-8 pr-3 py-2 bg-white border border-surface-border rounded-btn text-sm focus:outline-none focus:border-brand-300"
           />
         </div>
@@ -187,7 +193,7 @@ function goDetail(b: Batch) {
             <th class="text-left py-2.5 px-5 font-medium">架次名称 / ID</th>
             <th class="text-left py-2.5 px-5 font-medium">作物</th>
             <th class="text-left py-2.5 px-5 font-medium">飞行日期</th>
-            <th class="text-left py-2.5 px-5 font-medium">地块</th>
+            <th class="text-left py-2.5 px-5 font-medium">位置</th>
             <th class="text-left py-2.5 px-5 font-medium">机型</th>
             <th class="text-left py-2.5 px-5 font-medium">高度</th>
             <th class="text-right py-2.5 px-5 font-medium">图片数</th>
@@ -226,7 +232,12 @@ function goDetail(b: Batch) {
             </td>
             <td class="py-3 px-5"><span class="tag tag-green">{{ b.crop_type }}</span></td>
             <td class="py-3 px-5 text-ink-secondary text-xs">{{ b.flight_date }}</td>
-            <td class="py-3 px-5 text-ink-secondary text-xs">{{ b.plot_name || '-' }}</td>
+            <td class="py-3 px-5 text-ink-secondary text-xs">
+              <div>{{ b.plot_name || '-' }}</div>
+              <div v-if="geoText(b)" class="text-[10px] text-ink-tertiary font-mono flex items-center gap-1">
+                <Icon name="map-pin" :size="10" class="text-brand-700" />{{ geoText(b) }}
+              </div>
+            </td>
             <td class="py-3 px-5 text-ink-secondary text-xs">{{ b.drone_model || '-' }}</td>
             <td class="py-3 px-5 text-ink-secondary text-xs">
               {{ b.flight_altitude_m ? b.flight_altitude_m + ' m' : '-' }}

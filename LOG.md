@@ -38,3 +38,4 @@
 - [2026-11-23 00:37] build(desktop): 重建含设置模块的桌面端并产出 v1.1.0 NSIS 安装包（窗口自适应/F11/版本透传，新增构建说明文档）
 - [2026-11-24 15:12] feat(data): 架次登记无人机型号更新——预设补充 DJI Agras T 系列现役机型，选"其他"支持自填型号并持久化加入预选列表（BatchNew.vue）
 - [2026-11-24 15:16] feat(data): 无人机型号预设收敛为农田监测设备——移除 Agras T 系列，新增极飞 M2000/M500 2025 款巡田无人机（BatchNew.vue）
+- [2026-11-24 15:45] feat(data): 地块信息升级为地理位置信息——Leaflet 地图选点弹窗 + DJI 图片 EXIF GPS 提取接口，架次存 WGS84 经纬度/海拔/来源（geo_api/GeoLocationEditor）

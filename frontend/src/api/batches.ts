@@ -7,6 +7,14 @@ export interface Batch {
   crop_type: string
   flight_date: string
   plot_name?: string
+  /** WGS84 纬度（十进制度，EPSG:4326） */
+  latitude?: number | null
+  /** WGS84 经度（十进制度，EPSG:4326） */
+  longitude?: number | null
+  /** 海拔高度（米，EGM96 大地水准面基准） */
+  altitude_m?: number | null
+  /** 坐标来源：map_pick 地图选点 / image_exif 图片EXIF提取 */
+  geo_source?: string
   drone_model?: string
   flight_altitude_m?: number
   overlap_front?: number
@@ -66,6 +74,17 @@ export interface CreateBatchResponse {
   total_size_mb: number
 }
 
+export interface GeoExtractResult {
+  found: boolean
+  latitude: number | null
+  longitude: number | null
+  altitude_m: number | null
+  source_filename: string
+  images_with_gps: number
+  images_sampled: number
+  message: string
+}
+
 export const batchesApi = {
   list: (params?: { crop_type?: string; flight_date?: string; plot_name?: string }) =>
     client.get<unknown, { data: BatchListResponse }>('/batches', { params }),
@@ -96,4 +115,9 @@ export const batchesApi = {
     if (native) return { data: { cancelled: native.cancelled, path: native.path ?? undefined } }
     return client.post<unknown, { data: { cancelled?: boolean; path?: string } }>('/batches/pick-folder', {})
   },
+}
+
+export const geoApi = {
+  extractFromImages: (image_folder_path: string) =>
+    client.post<unknown, { data: GeoExtractResult }>('/geo/extract-from-images', { image_folder_path }),
 }

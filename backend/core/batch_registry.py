@@ -23,6 +23,7 @@ from config import (
 
 _BATCH_FIELD_ORDER = [
     "batch_id", "batch_name", "crop_type", "flight_date", "plot_name",
+    "latitude", "longitude", "altitude_m", "geo_source",
     "drone_model", "flight_altitude_m", "overlap_front", "overlap_side",
     "image_folder_path", "image_count", "total_size_bytes", "created_at",
     "image_formats", "status", "description",
@@ -92,6 +93,10 @@ class BatchRegistry:
                 "crop_type": metadata["crop_type"],
                 "flight_date": metadata["flight_date"],
                 "plot_name": "",
+                "latitude": None,
+                "longitude": None,
+                "altitude_m": None,
+                "geo_source": "",
                 "drone_model": DEFAULT_DRONE_MODEL,
                 "flight_altitude_m": metadata["flight_altitude_m"],
                 "overlap_front": DEFAULT_OVERLAP_FRONT,
@@ -241,6 +246,7 @@ class BatchRegistry:
             "crop_type": config["crop_type"],
             "flight_date": config["flight_date"],
             "plot_name": config.get("plot_name", ""),
+            **self._parse_geo_fields(config),
             "drone_model": config.get("drone_model") or DEFAULT_DRONE_MODEL,
             "flight_altitude_m": config.get("flight_altitude_m"),
             "overlap_front": float(config.get("overlap_front", DEFAULT_OVERLAP_FRONT)),
@@ -258,17 +264,51 @@ class BatchRegistry:
         self.save_to_yaml()
         return cfg
 
+    @staticmethod
+    def _parse_geo_fields(config: dict) -> dict:
+        """从表单提取地理位置字段（WGS84 十进制度），校验范围，非法则视为未填。"""
+        def _num(key):
+            val = config.get(key)
+            if val in (None, "", "null"):
+                return None
+            try:
+                return float(val)
+            except (TypeError, ValueError):
+                return None
+
+        latitude = _num("latitude")
+        longitude = _num("longitude")
+        altitude_m = _num("altitude_m")
+        if latitude is not None and not -90 <= latitude <= 90:
+            raise ValueError(f"纬度超出范围（-90~90）: {latitude}")
+        if longitude is not None and not -180 <= longitude <= 180:
+            raise ValueError(f"经度超出范围（-180~180）: {longitude}")
+        geo_source = (config.get("geo_source") or "").strip()
+        if geo_source not in ("map_pick", "image_exif", ""):
+            geo_source = ""
+        if (latitude is None) != (longitude is None):
+            raise ValueError("经纬度必须成对填写")
+        return {"latitude": latitude, "longitude": longitude,
+                "altitude_m": altitude_m, "geo_source": geo_source}
+
     def update_batch(self, batch_id: str, updates: dict) -> dict:
         """更新架次元数据（不可变字段会被忽略）。"""
         if batch_id not in self._batches:
             raise KeyError(f"架次不存在: {batch_id}")
         immutable = {"batch_id", "image_folder_path", "image_count",
                      "total_size_bytes", "created_at", "status"}
+        geo_keys = {"latitude", "longitude", "altitude_m", "geo_source"}
+        geo_updates = {}
+        if geo_keys & set(updates.keys()):
+            geo_updates = self._parse_geo_fields(updates)
         cfg = self._batches[batch_id]
         for key, val in updates.items():
-            if key in immutable:
+            if key in immutable or key in geo_keys:
                 continue
             if val is not None:
+                cfg[key] = val
+        for key, val in geo_updates.items():
+            if key in updates:
                 cfg[key] = val
         # 数值字段规范化
         if "overlap_front" in cfg and cfg["overlap_front"] is not None:

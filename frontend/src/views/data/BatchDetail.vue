@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Icon from '@/components/common/Icon.vue'
+import GeoLocationEditor, { type GeoValue } from '@/components/data/GeoLocationEditor.vue'
 import { batchesApi, type Batch, type BatchImage } from '@/api/batches'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
@@ -20,6 +21,18 @@ const loading = ref(true)
 const errorMsg = ref('')
 const editing = ref(false)
 const editForm = ref<Partial<Batch>>({})
+const editGeo = ref<GeoValue>({ latitude: null, longitude: null, altitude_m: null, geo_source: '' })
+
+const hasGeo = computed(
+  () => typeof batch.value?.latitude === 'number' && typeof batch.value?.longitude === 'number',
+)
+const geoSourceLabel = computed(() => {
+  switch (batch.value?.geo_source) {
+    case 'map_pick': return '地图选点'
+    case 'image_exif': return '图片 EXIF'
+    default: return ''
+  }
+})
 
 // Lightbox
 const lightboxIdx = ref(-1)
@@ -105,12 +118,24 @@ function startEdit() {
     overlap_side: batch.value.overlap_side,
     description: batch.value.description || '',
   }
+  editGeo.value = {
+    latitude: batch.value.latitude ?? null,
+    longitude: batch.value.longitude ?? null,
+    altitude_m: batch.value.altitude_m ?? null,
+    geo_source: batch.value.geo_source ?? '',
+  }
   editing.value = true
 }
 
 async function saveEdit() {
   try {
-    const updated = await batchesApi.update(id.value, editForm.value)
+    const updated = await batchesApi.update(id.value, {
+      ...editForm.value,
+      latitude: editGeo.value.latitude ?? null,
+      longitude: editGeo.value.longitude ?? null,
+      altitude_m: editGeo.value.altitude_m ?? null,
+      geo_source: editGeo.value.geo_source ?? '',
+    })
     batch.value = updated.data
     editing.value = false
   } catch (e: any) {
@@ -238,8 +263,12 @@ onMounted(load)
             <input v-model="editForm.flight_date" type="date" class="w-full px-3 py-2 bg-white border border-surface-border rounded-btn text-sm focus:outline-none focus:border-brand-300" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-ink-primary mb-1.5">地块名称</label>
-            <input v-model="editForm.plot_name" type="text" class="w-full px-3 py-2 bg-white border border-surface-border rounded-btn text-sm focus:outline-none focus:border-brand-300" />
+            <label class="block text-xs font-medium text-ink-primary mb-1.5">位置名称</label>
+            <input v-model="editForm.plot_name" type="text" placeholder="如：A区 / 甘蔗东地块" class="w-full px-3 py-2 bg-white border border-surface-border rounded-btn text-sm focus:outline-none focus:border-brand-300" />
+          </div>
+          <div class="col-span-2">
+            <label class="block text-xs font-medium text-ink-primary mb-1.5">地理位置信息</label>
+            <GeoLocationEditor v-model="editGeo" :folder-path="batch.image_folder_path" />
           </div>
           <div>
             <label class="block text-xs font-medium text-ink-primary mb-1.5">无人机型号</label>
@@ -302,7 +331,17 @@ onMounted(load)
           <div class="flex justify-between"><span class="text-ink-tertiary">架次 ID</span><span class="font-mono">{{ batch.batch_id }}</span></div>
           <div class="flex justify-between"><span class="text-ink-tertiary">作物类型</span><span>{{ batch.crop_type }}</span></div>
           <div class="flex justify-between"><span class="text-ink-tertiary">采集日期</span><span>{{ batch.flight_date }}</span></div>
-          <div class="flex justify-between"><span class="text-ink-tertiary">地块名称</span><span>{{ batch.plot_name || '-' }}</span></div>
+          <div class="flex justify-between"><span class="text-ink-tertiary">位置名称</span><span>{{ batch.plot_name || '-' }}</span></div>
+          <div class="flex justify-between col-span-2">
+            <span class="text-ink-tertiary">地理位置</span>
+            <span v-if="hasGeo" class="font-mono text-right">
+              {{ batch.latitude }}, {{ batch.longitude }}
+              <span class="text-ink-tertiary">(WGS84)</span>
+              <span v-if="batch.altitude_m != null" class="text-ink-tertiary"> · 海拔 {{ batch.altitude_m }} m</span>
+              <span v-if="geoSourceLabel" class="tag tag-green ml-1">{{ geoSourceLabel }}</span>
+            </span>
+            <span v-else class="text-ink-tertiary">未设置</span>
+          </div>
           <div class="flex justify-between"><span class="text-ink-tertiary">无人机型号</span><span>{{ batch.drone_model || '-' }}</span></div>
           <div class="flex justify-between"><span class="text-ink-tertiary">飞行高度</span><span>{{ batch.flight_altitude_m ?? '-' }} m</span></div>
           <div class="flex justify-between"><span class="text-ink-tertiary">前向重叠</span><span>{{ batch.overlap_front ?? '-' }}%</span></div>
