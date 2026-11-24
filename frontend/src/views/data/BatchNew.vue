@@ -7,6 +7,8 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const CUSTOM_CROPS_KEY = 'uav_vis_custom_crops'
+const CUSTOM_DRONES_KEY = 'uav_vis_custom_drones'
+const OTHER_DRONE = '其他'
 
 const router = useRouter()
 
@@ -32,7 +34,22 @@ const scanResult = ref<{ valid: boolean; image_count: number; total_size_bytes: 
 
 const cropOptions = ['甘蔗', '玉米', '小麦', '水稻']
 const customCropOptions = ref<string[]>([])
-const droneOptions = ['DJI Mavic 3 M', 'DJI Mavic 3', 'DJI Phantom 4 Pro', '其他']
+
+// 农田监测/巡田设备预设（2026-11 更新：大疆农田监测设备 + 极飞巡田无人机；T 系列偏喷洒播撒不纳入）
+const baseDroneOptions = [
+  'DJI Mavic 3 M', 'DJI Mavic 3', 'DJI Phantom 4 Pro',
+  '极飞 M2000 2025 款巡田无人机', '极飞 M500 2025 款巡田无人机',
+]
+const customDroneOptions = ref<string[]>([])
+const customDroneModel = ref('')
+const droneOptions = computed(() => {
+  const merged = [...baseDroneOptions, ...customDroneOptions.value]
+  return Array.from(new Set(merged)).concat(OTHER_DRONE)
+})
+const isOtherDrone = computed(() => form.value.drone_model === OTHER_DRONE)
+const effectiveDroneModel = computed(() =>
+  isOtherDrone.value ? customDroneModel.value.trim() : form.value.drone_model
+)
 
 const allCropOptions = computed(() => {
   const merged = [...cropOptions, ...customCropOptions.value]
@@ -46,6 +63,17 @@ onMounted(() => {
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed)) {
         customCropOptions.value = parsed.filter((x) => typeof x === 'string' && x.trim())
+      }
+    }
+  } catch {
+    // 忽略损坏的 localStorage 数据
+  }
+  try {
+    const raw = localStorage.getItem(CUSTOM_DRONES_KEY)
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        customDroneOptions.value = parsed.filter((x) => typeof x === 'string' && x.trim())
       }
     }
   } catch {
@@ -117,18 +145,34 @@ async function doPick() {
   }
 }
 
+function persistCustomDrone(model: string) {
+  if (!model || customDroneOptions.value.includes(model)) return
+  customDroneOptions.value = [...customDroneOptions.value, model]
+  try {
+    localStorage.setItem(CUSTOM_DRONES_KEY, JSON.stringify(customDroneOptions.value))
+  } catch {
+    // localStorage 可能已满或不可用，忽略
+  }
+}
+
 async function submit() {
   if (!canSubmit.value) return
+  if (isOtherDrone.value && !customDroneModel.value.trim()) {
+    errorMsg.value = '无人机型号选择了"其他"，请输入实际使用的无人机型号'
+    return
+  }
   submitting.value = true
   successMsg.value = ''
   errorMsg.value = ''
   try {
     const res = await batchesApi.create({
       ...form.value,
+      drone_model: effectiveDroneModel.value,
       image_folder_path: imagePath.value,
       overlap_front: overlapFront.value,
       overlap_side: overlapSide.value,
     })
+    if (isOtherDrone.value) persistCustomDrone(effectiveDroneModel.value)
     successMsg.value = '架次登记成功'
     const batchId = res.data.batch_id
     setTimeout(() => {
@@ -147,6 +191,7 @@ function resetForm() {
     plot_name: '', drone_model: 'DJI Mavic 3 M', flight_altitude_m: 5, description: '',
   }
   imagePath.value = ''
+  customDroneModel.value = ''
   overlapFront.value = 0.8
   overlapSide.value = 0.7
   scanResult.value = null
@@ -286,6 +331,17 @@ function formatBytes(bytes: number): string {
               <select v-model="form.drone_model" class="w-full px-3 py-2 bg-white border border-surface-border rounded-btn text-sm">
                 <option v-for="d in droneOptions" :key="d" :value="d">{{ d }}</option>
               </select>
+              <input
+                v-if="isOtherDrone"
+                v-model="customDroneModel"
+                type="text"
+                placeholder="请输入实际使用的无人机型号，如：大疆 Matrice 350 RTK"
+                class="mt-2 w-full px-3 py-2 bg-white border border-surface-border rounded-btn text-sm focus:outline-none focus:border-brand-300"
+              />
+              <p v-if="isOtherDrone" class="text-xs text-ink-tertiary mt-1.5">
+                <Icon name="info" :size="12" class="inline" />
+                登记成功后，该型号将自动加入无人机型号预选列表
+              </p>
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
@@ -321,7 +377,7 @@ function formatBytes(bytes: number): string {
             <div class="flex justify-between"><span class="text-ink-tertiary">采集日期</span><span class="text-ink-primary">{{ form.flight_date || '—' }}</span></div>
             <div class="flex justify-between"><span class="text-ink-tertiary">地块名称</span><span class="text-ink-primary">{{ form.plot_name || '—' }}</span></div>
             <div class="flex justify-between"><span class="text-ink-tertiary">飞行高度</span><span class="text-ink-primary">{{ form.flight_altitude_m }} m</span></div>
-            <div class="flex justify-between"><span class="text-ink-tertiary">机型</span><span class="text-ink-primary">{{ form.drone_model }}</span></div>
+            <div class="flex justify-between"><span class="text-ink-tertiary">机型</span><span class="text-ink-primary">{{ effectiveDroneModel || '—' }}</span></div>
             <div class="flex justify-between"><span class="text-ink-tertiary">航向/旁向</span><span class="text-ink-primary">{{ overlapFront }} / {{ overlapSide }}</span></div>
             <div class="border-t border-surface-border my-1.5"></div>
             <div class="flex justify-between gap-2"><span class="text-ink-tertiary flex-shrink-0">图片路径</span><span class="text-ink-primary font-mono text-[11px] text-right break-all">{{ imagePath || '—' }}</span></div>
