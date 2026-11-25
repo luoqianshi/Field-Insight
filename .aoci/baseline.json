@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-11-25T05:23:44Z",
-  "updated_at": "2026-11-25T16:49:37Z",
+  "updated_at": "2026-11-25T17:13:25Z",
   "files": {
     ".gitattributes": {
       "role": "index",
@@ -839,9 +839,9 @@
     },
     "LOG.md": {
       "role": "index",
-      "sha256": "8793697a0d4351acbd66295a3135f6979a54b068160e85e4ba84e11aa7cb3b96",
-      "size": 6785,
-      "normalized_sha256": "965a1da6538a30fb8c7fdaaa30857f96e872c6e1b1479baa162d6b4fc69fa658"
+      "sha256": "a21c30c72318b7bdefb382533765c9ad34fee0fde3c9951da321fa4eafbc0a4c",
+      "size": 7028,
+      "normalized_sha256": "59beb9762673e23eafaf277971366eafe84a3fbfdd2a359a6cb35bff6e824c79"
     },
     "README.md": {
       "role": "index",
@@ -851,15 +851,15 @@
     },
     "VERSIONS.md": {
       "role": "index",
-      "sha256": "6204880e4e062e4c8f97b4f568418e29129b2817b3bf32d132ae369ec74305fe",
-      "size": 19016,
-      "normalized_sha256": "6204880e4e062e4c8f97b4f568418e29129b2817b3bf32d132ae369ec74305fe"
+      "sha256": "f6749d5059e9639bbf979ad6b2d39cba0d1b64468341e4d56976dc16fff8f370",
+      "size": 22735,
+      "normalized_sha256": "f6749d5059e9639bbf979ad6b2d39cba0d1b64468341e4d56976dc16fff8f370"
     },
     "aoci.code.txt": {
       "role": "index",
-      "sha256": "dcb84ad1207442e3bdb750279872be20a9b97286157483d103e642b5c34e18ca",
-      "size": 92342,
-      "normalized_sha256": "dcb84ad1207442e3bdb750279872be20a9b97286157483d103e642b5c34e18ca"
+      "sha256": "7d7548873275c90615866fe4619abb799204d267383a0896c41ddbf59e2f6cbb",
+      "size": 92511,
+      "normalized_sha256": "7d7548873275c90615866fe4619abb799204d267383a0896c41ddbf59e2f6cbb"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -945,9 +945,9 @@
     },
     "backend/config.py": {
       "role": "index",
-      "sha256": "4f69ff64cf3314e71d8e5e7a78a785c6a807ff58841793bab563eb192ccfa321",
+      "sha256": "be28bcdb304c8d7e2c151cbb775c94fcad50017a15c047cbf819cd131b31af0f",
       "size": 6392,
-      "normalized_sha256": "91c9361ac3af2b53b2671d02686b934e9d4cbf94e3a18c963604cbf1a8d19878"
+      "normalized_sha256": "eae498c702d77aa90a1e8631211399399a0e00c2b48b420584df1f8fb675616e"
     },
     "backend/conftest.py": {
       "role": "index",
@@ -2367,9 +2367,9 @@
     },
     "electron/package.json": {
       "role": "index",
-      "sha256": "4b2c720d633530fbe28c741144953873855f48b7fdc18ab83c4ea4e43f9d246f",
+      "sha256": "1a961305b42b9d18fa466be4721a2cd9c2bcceeb528b73737b992f374585db8c",
       "size": 1659,
-      "normalized_sha256": "4b2c720d633530fbe28c741144953873855f48b7fdc18ab83c4ea4e43f9d246f"
+      "normalized_sha256": "1a961305b42b9d18fa466be4721a2cd9c2bcceeb528b73737b992f374585db8c"
     },
     "electron/preload.js": {
       "role": "index",

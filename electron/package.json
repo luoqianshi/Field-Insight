@@ -1,6 +1,6 @@
 {
   "name": "tianjianzhikan-desktop",
-  "version": "0.5.7",
+  "version": "0.5.8",
   "private": true,
   "description": "田间智瞰 Electron 桌面壳（含设置模块）",
   "author": "luoqianshi",

@@ -49,3 +49,4 @@
 - [2026-11-25 21:53] fix(process): 移除自定义目录输入源并加后端校验，删详情静态冗余字段，长路径缩略显示
 - [2026-11-25 23:50] build(desktop): 版本升至 0.5.7 并产出 Electron 便携目录与 NSIS 安装包（CPU torch 载荷重建/冒烟与静默安装卸载验证，VERSIONS.md 同步）
 - [2026-11-26 00:47] feat(settings,process): 任务详情参数/信息卡底部与预览右边界对齐并移除执行日志；设置页双栏底部齐平，存储路径双击复制与打开本地目录（新增 /api/settings/open-folder）
+- [2026-11-26 01:10] build(desktop): 版本升至 0.5.8 并产出 Electron 便携目录与 NSIS 安装包（载荷 851.5MB/3382 文件、win-unpacked 1119.4MB、setup 365.1MiB，冒烟与静默安装卸载验证通过，VERSIONS.md 同步）
