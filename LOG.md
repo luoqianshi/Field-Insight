@@ -39,3 +39,4 @@
 - [2026-11-24 15:12] feat(data): 架次登记无人机型号更新——预设补充 DJI Agras T 系列现役机型，选"其他"支持自填型号并持久化加入预选列表（BatchNew.vue）
 - [2026-11-24 15:16] feat(data): 无人机型号预设收敛为农田监测设备——移除 Agras T 系列，新增极飞 M2000/M500 2025 款巡田无人机（BatchNew.vue）
 - [2026-11-24 15:45] feat(data): 地块信息升级为地理位置信息——Leaflet 地图选点弹窗 + DJI 图片 EXIF GPS 提取接口，架次存 WGS84 经纬度/海拔/来源（geo_api/GeoLocationEditor）
+- [2026-11-25 13:33] chore(aoci): 安装 AOCI-CODE v0.2.0-rc4（校验和+attestation 双层校验通过）并完成 init/scan 初始化，生成认知资产骨架与基线，MCP 接入待 Trae 重启生效（aoci.exe @ %LOCALAPPDATA%\Programs\aoci）
