@@ -44,9 +44,9 @@ def _app_version() -> str:
         return env_version
     try:
         pkg = Path(__file__).resolve().parent.parent / "electron" / "package.json"
-        return json.loads(pkg.read_text(encoding="utf-8")).get("version") or "1.0.0"
+        return json.loads(pkg.read_text(encoding="utf-8")).get("version") or "0.5.6"
     except Exception:
-        return "1.0.0"
+        return "0.5.6"
 
 
 APP_VERSION = _app_version()
