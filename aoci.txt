@@ -1,7 +1,7 @@
 #AOCI-ROOT-MANIFEST: 1
 #Format-Version: cognition-volumes/v1
 #Locale: zh-CN
-#Project: UAV-Visual-Intelligence-System-in-Agriculture
-#Global-Invariants: -
+#Project: 田间智瞰：基于无人机航拍图像的大田农作物智能监测系统，含数据管理(图像批次/架次登记)、图像预处理增强、数据集管理与算法广场(目标检测/作物计数)四大模块。Flask 后端同时提供 API 并托管 Vue3 前端构建产物，另以 Electron 封装为桌面端。
+#Global-Invariants: 1) API 统一响应信封 {success,data,message}，单图失败只做错误隔离、不得中断整批；2) Web 与桌面共用 backend/ 与 frontend/，以 config.py 的 FROZEN 门控区分形态：冻结态只读资源根与可写数据根(%LOCALAPPDATA%\TianJianZhiKan)分离，非冻结态必须与 Web 开发行为一致，严禁删除用户数据根；3) 注册中心以 YAML 持久化，新增运行目录一律走 config.py 常量、禁止硬编码路径，模型权重保持「打包资源目录→开发相对路径」两级回退；4) 不修改 backend/api/ 既有路由签名；5) 前端浅色 Gradio 风格、主色 #10B981，禁玻璃拟态/霓虹/脉冲动画，图标用 SVG；6) 桌面发行必须 CPU 版 torch，退出须回收后端子进程。
 #Volume: id=meta kind=meta path=aoci.meta.txt format=meta-v1 depends=- state=enabled
 #Volume: id=code kind=code path=aoci.code.txt format=object-fras-v2 depends=meta state=enabled
