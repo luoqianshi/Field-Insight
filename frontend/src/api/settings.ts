@@ -128,6 +128,10 @@ export const settingsApi = {
 
   about: () => client.get<unknown, { data: AboutInfo }>('/settings/about'),
 
+  // 打开受管目录（key: root | data | output | datasets | results | models | config）
+  openFolder: (key: string) =>
+    client.post<unknown, { data: { path: string } }>('/settings/open-folder', { key }),
+
   // 桌面态原生桥优先，Web 态回退后端对话框（镜像 batches.pickFolder）
   pickFolder: async () => {
     const native = await nativePickFolder()

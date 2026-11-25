@@ -16,6 +16,9 @@ const picking = ref(false)
 const pickError = ref('')
 const restarting = ref(false)
 const cleaning = ref(false)
+const opening = ref('')
+const notice = ref('')
+let noticeTimer: number | undefined
 
 onMounted(async () => {
   store.fetchStorage()
@@ -31,6 +34,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', onBeforeUnload)
+  if (noticeTimer) clearTimeout(noticeTimer)
   store.stopPolling()
 })
 
@@ -78,6 +82,54 @@ function fmtBytes(n: number): string {
     i++
   }
   return `${i === 0 ? v : v.toFixed(1)} ${units[i]}`
+}
+
+function flashNotice(msg: string) {
+  notice.value = msg
+  if (noticeTimer) clearTimeout(noticeTimer)
+  noticeTimer = window.setTimeout(() => {
+    notice.value = ''
+  }, 2200)
+}
+
+// 双击路径复制完整地址：优先 Clipboard API，不可用或拒绝时回退 execCommand
+function copyByExecCommand(text: string): boolean {
+  const ta = document.createElement('textarea')
+  ta.value = text
+  ta.style.position = 'fixed'
+  ta.style.opacity = '0'
+  document.body.appendChild(ta)
+  ta.select()
+  const ok = document.execCommand('copy')
+  document.body.removeChild(ta)
+  return ok
+}
+
+async function copyPath(path: string) {
+  const text = (path || '').trim()
+  if (!text) return
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text)
+      flashNotice('已复制路径')
+      return
+    }
+  } catch {
+    // 权限或安全上下文限制，继续回退
+  }
+  if (copyByExecCommand(text)) flashNotice('已复制路径')
+  else flashNotice('复制失败，请手动选择路径复制')
+}
+
+async function openFolder(key: string) {
+  opening.value = key
+  try {
+    await settingsApi.openFolder(key)
+  } catch (e: any) {
+    alert(e.message || '打开文件夹失败')
+  } finally {
+    opening.value = ''
+  }
 }
 
 async function changeLocation() {
@@ -225,8 +277,8 @@ function onMigrated() {
         </div>
       </div>
 
-      <!-- 主体：宽屏左右两栏（存储 2/3 + 磁盘/关于 1/3），窄屏纵向堆叠 -->
-      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 items-start">
+      <!-- 主体：宽屏左右两栏（存储 2/3 + 磁盘/关于 1/3），两栏底部齐平；窄屏纵向堆叠 -->
+      <div class="grid grid-cols-1 xl:grid-cols-3 gap-4">
       <!-- 数据存储 -->
       <div class="xl:col-span-2 bg-white border border-surface-border rounded-card shadow-card">
         <div class="flex items-center justify-between px-5 py-4 border-b border-surface-border">
@@ -260,9 +312,25 @@ function onMigrated() {
 
           <template v-if="ov">
             <!-- 当前根 -->
-            <div>
-              <div class="text-xs text-ink-tertiary mb-1">当前数据根目录</div>
-              <div class="font-mono text-sm text-ink-primary break-all">{{ ov.active_root }}</div>
+            <div class="flex items-start justify-between gap-3">
+              <div class="min-w-0">
+                <div class="text-xs text-ink-tertiary mb-1">
+                  当前数据根目录
+                  <span class="text-[10px] text-ink-tertiary/80">（双击复制）</span>
+                </div>
+                <div
+                  class="font-mono text-sm text-ink-primary break-all cursor-copy hover:text-brand-700 transition-colors"
+                  :title="`双击复制：${ov.active_root}`"
+                  @dblclick="copyPath(ov.active_root)"
+                >{{ ov.active_root }}</div>
+              </div>
+              <button
+                @click="openFolder('root')"
+                :disabled="opening === 'root'"
+                class="flex-shrink-0 px-2.5 py-1.5 bg-white border border-surface-border hover:bg-surface-hover rounded-btn text-xs text-ink-secondary inline-flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              >
+                <Icon name="folder-open" :size="13" /> 打开目录
+              </button>
             </div>
 
             <!-- 模块目录卡片 -->
@@ -276,7 +344,21 @@ function onMigrated() {
                   <span class="text-sm font-medium text-ink-primary">{{ m.label }}</span>
                   <span class="tag">{{ m.key }}</span>
                 </div>
-                <div class="text-xs text-ink-tertiary font-mono truncate mb-1.5" :title="m.dir">{{ m.dir }}</div>
+                <div class="flex items-center gap-1 mb-1.5">
+                  <div
+                    class="min-w-0 flex-1 text-xs text-ink-tertiary font-mono truncate cursor-copy hover:text-brand-700 transition-colors"
+                    :title="`双击复制：${m.dir}`"
+                    @dblclick="copyPath(m.dir)"
+                  >{{ m.dir }}</div>
+                  <button
+                    @click="openFolder(m.key)"
+                    :disabled="opening === m.key"
+                    class="flex-shrink-0 p-1 rounded text-ink-tertiary hover:text-brand-700 hover:bg-surface-hover transition-colors disabled:opacity-50"
+                    :title="`打开 ${m.label} 目录`"
+                  >
+                    <Icon name="folder-open" :size="13" />
+                  </button>
+                </div>
                 <div class="text-xs text-ink-secondary font-numeric">{{ fmtBytes(m.size_bytes) }} · {{ m.file_count }} 个文件</div>
               </div>
             </div>
@@ -304,8 +386,8 @@ function onMigrated() {
         </div>
       </div>
 
-      <!-- 右栏：磁盘占用 + 关于 -->
-      <div class="space-y-4">
+      <!-- 右栏：磁盘占用 + 关于（随左栏等高，底部与数据存储卡片齐平） -->
+      <div class="flex flex-col gap-4">
         <!-- 磁盘占用 -->
         <div class="bg-white border border-surface-border rounded-card shadow-card">
           <div class="flex items-center gap-2 px-5 py-4 border-b border-surface-border">
@@ -350,7 +432,7 @@ function onMigrated() {
         </div>
 
         <!-- 关于 -->
-        <div class="bg-white border border-surface-border rounded-card shadow-card">
+        <div class="flex-1 bg-white border border-surface-border rounded-card shadow-card">
           <div class="flex items-center gap-2 px-5 py-4 border-b border-surface-border">
             <Icon name="info" :size="18" class="text-brand-700" />
             <span class="font-semibold text-ink-primary">关于</span>
@@ -384,5 +466,11 @@ function onMigrated() {
       :initial-target="initialTarget"
       @migrated="onMigrated"
     />
+
+    <!-- 复制/打开反馈 -->
+    <div
+      v-if="notice"
+      class="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-btn bg-ink-primary text-white text-xs shadow-lg"
+    >{{ notice }}</div>
   </AppLayout>
 </template>

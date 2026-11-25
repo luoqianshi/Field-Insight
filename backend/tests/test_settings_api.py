@@ -139,6 +139,32 @@ def test_pick_folder_frozen_guard(client, iso, monkeypatch):
     assert "原生" in body["message"]
 
 
+def test_open_folder_rejects_unknown_key(client, iso):
+    for key in ("", "../etc", "static"):
+        resp = client.post("/api/settings/open-folder", json={"key": key})
+        assert resp.status_code == 400
+        assert resp.get_json()["success"] is False
+
+
+def test_open_folder_opens_managed_dir(client, iso, monkeypatch):
+    opened = []
+    monkeypatch.setattr("api.settings_api._open_in_file_manager",
+                        lambda p: opened.append(str(p)))
+    body = client.post("/api/settings/open-folder", json={"key": "output"}).get_json()
+    assert body["success"] is True
+    assert body["data"]["path"] == str(iso.source / "output")
+    assert opened == [str(iso.source / "output")]
+    assert (iso.source / "output").is_dir()
+
+    body = client.post("/api/settings/open-folder", json={"key": "root"}).get_json()
+    assert body["data"]["path"] == str(iso.source)
+
+    # 冻结态多出的 config 目录同样可打开
+    monkeypatch.setattr(config, "FROZEN", True)
+    body = client.post("/api/settings/open-folder", json={"key": "config"}).get_json()
+    assert body["success"] is True
+
+
 def test_about(client, iso):
     body = client.get("/api/settings/about").get_json()
     assert body["success"] is True

@@ -3,7 +3,10 @@
 计划书：docs/sdd/plans/2026-11-20-settings-storage-migration.md §3.3
 所有响应遵循统一信封：{"success": bool, "data": <data>|None, "message": str}。
 """
+import os
+import subprocess
 import sys
+from pathlib import Path
 
 from flask import Blueprint, jsonify, request
 
@@ -171,6 +174,42 @@ def pick_folder():
         return jsonify({"success": False, "data": {"cancelled": True},
                         "message": "用户取消选择"}), 200
     return _ok({"path": folder.replace("\\", "/")}, "文件夹选择成功")
+
+
+# ── 打开本地目录（Web/桌面通用：后端与用户同机）────────────────
+def _open_in_file_manager(target: Path) -> None:
+    """用系统文件管理器打开目录（Windows/macOS/Linux）。"""
+    if sys.platform.startswith("win"):
+        os.startfile(str(target))  # type: ignore[attr-defined]
+    elif sys.platform == "darwin":
+        subprocess.Popen(["open", str(target)])
+    else:
+        subprocess.Popen(["xdg-open", str(target)])
+
+
+@settings_bp.route("/api/settings/open-folder", methods=["POST"])
+def open_folder():
+    """POST /api/settings/open-folder → 打开受管目录（body: {"key": "root" | "data" | ...}）。
+
+    只接受受管目录标识，路径由后端解析，避免前端传入任意路径被直接执行。
+    """
+    body = request.get_json(silent=True) or {}
+    key = str(body.get("key") or "").strip()
+    if key == "root":
+        target = Path(config.PROJECT_ROOT)
+    elif key in storage_settings.managed_dir_names():
+        target = Path(config.PROJECT_ROOT) / key
+    else:
+        return _error("未知目录标识", 400)
+    try:
+        target.mkdir(parents=True, exist_ok=True)
+    except OSError as exc:
+        return _error(f"目录不可用: {exc}", 400)
+    try:
+        _open_in_file_manager(target)
+    except Exception as exc:
+        return _error(f"打开目录失败: {exc}", 500)
+    return _ok({"path": str(target)}, "已在文件管理器中打开")
 
 
 # ── 关于 ──────────────────────────────────────────────────────

@@ -7,7 +7,7 @@ import Icon from '@/components/common/Icon.vue'
 import PathText from '@/components/common/PathText.vue'
 import ImageViewer from '@/components/common/ImageViewer.vue'
 
-// 1:1 迁移 process/task-detail.html：任务参数 + 结果预览(网格/对比) + 执行日志
+// 1:1 迁移 process/task-detail.html：任务参数 + 结果预览(网格/对比)
 const route = useRoute()
 const id = computed(() => String(route.params.id))
 
@@ -233,147 +233,131 @@ onUnmounted(stopPolling)
         </div>
       </div>
 
-      <div class="grid grid-cols-3 gap-5">
-        <div class="col-span-2 space-y-5">
-          <!-- 任务参数 -->
-          <div class="bg-white border border-surface-border rounded-card p-5">
-            <h3 class="text-sm font-semibold text-ink-primary mb-3">任务参数</h3>
-            <div class="grid grid-cols-4 gap-4 pt-4 border-t border-surface-border">
-              <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">输入源</div><PathText :path="inputLabel" class="text-sm font-medium text-ink-primary" /></div>
-              <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">{{ isClahe ? '阈值 (clipLimit)' : '切片尺寸' }}</div><div class="text-sm font-medium text-ink-primary">{{ isClahe ? (task.params?.clip_limit ?? '2.0') : (task.params?.tile_size ?? '640') }}</div></div>
-              <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">{{ isClahe ? '网格数量' : '重叠率' }}</div><div class="text-sm font-medium text-ink-primary">{{ isClahe ? gridLabel : (task.params?.overlap_ratio ?? '0.05') }}</div></div>
-              <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">输出目录</div><PathText :path="task.output_path" class="text-sm font-mono text-ink-primary" /></div>
-            </div>
-          </div>
-
-          <!-- 快速预览（按方法差异化） -->
-          <div class="bg-white border border-surface-border rounded-card p-5">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-sm font-semibold text-ink-primary">快速预览</h3>
-              <span class="text-xs text-ink-tertiary">
-                <template v-if="isClahe">第一张图片 · 增强前后对比</template>
-                <template v-else-if="isCrop">第一张原图 · 滑窗分块结果</template>
-              </span>
-            </div>
-
-            <!-- CLAHE：原图 vs 增强后单图对比 -->
-            <div v-if="isClahe">
-              <div v-if="!firstClaheFile" class="py-12 text-center text-xs text-ink-tertiary">
-                暂无预览图
-              </div>
-              <div v-else class="grid grid-cols-2 gap-4">
-                <div>
-                  <div class="text-xs text-ink-tertiary mb-2 flex items-center gap-1.5">
-                    <Icon name="image" :size="12" /> 原图
-                    <span class="ml-auto text-[10px] text-brand-700/70 inline-flex items-center gap-1">
-                      <Icon name="search" :size="10" /> 点击放大
-                    </span>
-                  </div>
-                  <div
-                    class="aspect-[4/3] bg-gradient-to-br from-green-50 to-amber-50 rounded-btn flex items-center justify-center border border-surface-border overflow-hidden cursor-zoom-in group relative"
-                    @click="openViewer(previewUrl(firstClaheFile.filename, firstSubDir, 'original'), firstClaheFile.filename + ' · 原图')"
-                  >
-                    <img :src="previewUrl(firstClaheFile.filename, firstSubDir, 'medium')" :alt="firstClaheFile.filename" class="w-full h-full object-contain transition-transform duration-200 group-hover:scale-[1.02]" />
-                  </div>
-                  <div class="mt-1.5 text-xs font-mono text-ink-primary truncate">{{ firstClaheFile.filename }}</div>
-                </div>
-                <div>
-                  <div class="text-xs text-ink-tertiary mb-2 flex items-center gap-1.5">
-                    <Icon name="sparkle" :size="12" class="text-brand-700" /> CLAHE 增强后
-                    <span class="ml-auto text-[10px] text-brand-700/70 inline-flex items-center gap-1">
-                      <Icon name="search" :size="10" /> 点击放大
-                    </span>
-                  </div>
-                  <div
-                    class="aspect-[4/3] bg-gradient-to-br from-emerald-50 to-green-100 rounded-btn flex items-center justify-center border border-brand-100 overflow-hidden cursor-zoom-in group relative"
-                    @click="openViewer(previewUrl(firstClaheFile.filename, firstSubDir, 'original'), firstClaheFile.filename + ' · CLAHE')"
-                  >
-                    <img :src="previewUrl(firstClaheFile.filename, firstSubDir, 'medium')" :alt="firstClaheFile.filename" class="w-full h-full object-contain transition-transform duration-200 group-hover:scale-[1.02]" />
-                  </div>
-                  <div class="mt-1.5 text-xs font-mono text-ink-primary truncate">{{ firstClaheFile.filename }}</div>
-                </div>
-              </div>
-              <div class="mt-3 flex items-center text-xs text-ink-tertiary">
-                <Icon name="info" :size="12" class="mr-1.5" /> 同一文件名左为原图、右为增强后；输出目录为 <PathText :path="task.output_path" class="px-1 py-0.5 bg-surface-hover rounded font-mono max-w-[320px]" />
-              </div>
-            </div>
-
-            <!-- Crop：第一张 tile（代理预览） + 该原图对应的所有 tile 网格 -->
-            <div v-else-if="isCrop">
-              <div v-if="!firstCropTile && tileFiles.length === 0" class="py-12 text-center text-xs text-ink-tertiary">
-                暂无预览图
-              </div>
-              <template v-else>
-                <!-- 第一张 tile（可视作第一张图片的左上角分块） -->
-                <div v-if="firstCropTile" class="mb-4">
-                  <div class="text-xs text-ink-tertiary mb-2 flex items-center gap-1.5">
-                    <Icon name="image" :size="12" /> 第一张图片 · 左上角分块预览
-                    <span class="ml-auto text-[10px] text-brand-700/70 inline-flex items-center gap-1">
-                      <Icon name="search" :size="10" /> 点击放大
-                    </span>
-                  </div>
-                  <div
-                    class="aspect-[16/9] bg-gradient-to-br from-green-50 to-amber-50 rounded-btn flex items-center justify-center border border-surface-border overflow-hidden cursor-zoom-in group relative"
-                    @click="openViewer(previewUrl(firstCropTile.filename, firstSubDir, 'original'), firstCropTile.filename)"
-                  >
-                    <img :src="previewUrl(firstCropTile.filename, firstSubDir, 'medium')" :alt="firstCropTile.filename" class="w-full h-full object-contain transition-transform duration-200 group-hover:scale-[1.02]" />
-                  </div>
-                  <div class="mt-1.5 text-xs font-mono text-ink-primary truncate">{{ firstCropTile.filename }}</div>
-                </div>
-
-                <!-- Tile 缩略图网格 -->
-                <div>
-                  <div class="text-xs text-ink-tertiary mb-2 flex items-center gap-1.5">
-                    <Icon name="grid" :size="12" /> 分块缩略图
-                    <span class="text-ink-tertiary">（{{ tileFiles.length }} 张 · 对应原图 stem: <code class="px-1 bg-surface-hover rounded">{{ firstCropOrigStem || '—' }}</code>）</span>
-                    <span class="ml-auto text-[10px] text-brand-700/70 inline-flex items-center gap-1">
-                      <Icon name="search" :size="10" /> 单击放大
-                    </span>
-                  </div>
-                  <div v-if="tileFiles.length === 0" class="py-8 text-center text-xs text-ink-tertiary">未找到对应 tile</div>
-                  <div v-else class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                    <div
-                      v-for="t in tileFiles"
-                      :key="t.filename"
-                      class="border border-surface-border rounded-btn overflow-hidden cursor-zoom-in group relative"
-                      @click="openViewer(previewUrl(t.filename, firstSubDir, 'original'), t.filename)"
-                    >
-                      <div class="aspect-square bg-gradient-to-br from-green-50 to-amber-50">
-                        <img :src="previewUrl(t.filename, firstSubDir, 'thumbnail')" :alt="t.filename" class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" loading="lazy" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </template>
-            </div>
-          </div>
-
-          <!-- 执行日志 -->
-          <div class="bg-white border border-surface-border rounded-card p-5">
-            <h3 class="text-sm font-semibold text-ink-primary mb-3">执行日志</h3>
-            <div class="font-mono text-xs bg-surface-bg rounded-btn p-3 leading-6 text-ink-secondary break-all">
-              <div><span class="text-ink-tertiary">[{{ task.created_at }}]</span> 任务启动 · TASK_ID={{ task.task_id }}</div>
-              <div><span class="text-ink-tertiary">[{{ task.created_at }}]</span> 加载输入：{{ inputLabel }} ({{ task.total_images }} 张)</div>
-              <div><span class="text-ink-tertiary">[运行]</span> 参数：{{ isClahe ? `clipLimit=${task.params?.clip_limit ?? 2.0}` : `tile=${task.params?.tile_size ?? 640}, overlap=${task.params?.overlap_ratio ?? 0.05}` }}</div>
-              <div v-if="task.status === 'processing'"><span class="text-ink-tertiary">[运行中]</span> 处理进度：{{ task.processed_images }}/{{ task.total_images }} ({{ task.progress }}%)</div>
-              <div v-if="task.status === 'completed'"><span class="text-brand-700">[完成]</span> 任务完成 · 输出 {{ task.output_path }}</div>
-              <div v-if="task.status === 'failed'"><span class="text-red-600">[失败]</span> {{ task.error || '执行异常' }}</div>
-            </div>
+      <!-- 任务参数 + 任务信息：同一行栅格，两卡片底部齐平 -->
+      <div class="grid grid-cols-3 gap-5 mb-5">
+        <!-- 任务参数 -->
+        <div class="col-span-2 bg-white border border-surface-border rounded-card p-5">
+          <h3 class="text-sm font-semibold text-ink-primary mb-3">任务参数</h3>
+          <div class="grid grid-cols-4 gap-4 pt-4 border-t border-surface-border">
+            <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">输入源</div><PathText :path="inputLabel" class="text-sm font-medium text-ink-primary" /></div>
+            <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">{{ isClahe ? '阈值 (clipLimit)' : '切片尺寸' }}</div><div class="text-sm font-medium text-ink-primary">{{ isClahe ? (task.params?.clip_limit ?? '2.0') : (task.params?.tile_size ?? '640') }}</div></div>
+            <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">{{ isClahe ? '网格数量' : '重叠率' }}</div><div class="text-sm font-medium text-ink-primary">{{ isClahe ? gridLabel : (task.params?.overlap_ratio ?? '0.05') }}</div></div>
+            <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">输出目录</div><PathText :path="task.output_path" class="text-sm font-mono text-ink-primary" /></div>
           </div>
         </div>
 
-        <div class="space-y-5">
-          <!-- 任务信息 -->
-          <div class="bg-white border border-surface-border rounded-card p-5">
-            <h3 class="text-sm font-semibold text-ink-primary mb-3">任务信息</h3>
-            <div class="space-y-2.5 text-xs">
-              <div class="flex justify-between"><span class="text-ink-tertiary">任务 ID</span><span class="font-mono text-ink-primary">{{ task.task_id }}</span></div>
-              <div class="flex justify-between"><span class="text-ink-tertiary">类型</span><span class="text-ink-primary">{{ typeLabel(task.task_type) }}</span></div>
-              <div class="flex justify-between"><span class="text-ink-tertiary">开始时间</span><span class="text-ink-primary">{{ task.started_at || task.created_at }}</span></div>
-              <div class="flex justify-between"><span class="text-ink-tertiary">结束时间</span><span class="text-ink-primary">{{ task.completed_at || '—' }}</span></div>
-              <div class="flex justify-between gap-2"><span class="text-ink-tertiary flex-shrink-0">输入路径</span><PathText :path="inputLabel" class="font-mono text-ink-primary text-[11px] text-right" /></div>
+        <!-- 任务信息 -->
+        <div class="bg-white border border-surface-border rounded-card p-5">
+          <h3 class="text-sm font-semibold text-ink-primary mb-3">任务信息</h3>
+          <div class="space-y-2.5 text-xs">
+            <div class="flex justify-between"><span class="text-ink-tertiary">任务 ID</span><span class="font-mono text-ink-primary">{{ task.task_id }}</span></div>
+            <div class="flex justify-between"><span class="text-ink-tertiary">类型</span><span class="text-ink-primary">{{ typeLabel(task.task_type) }}</span></div>
+            <div class="flex justify-between"><span class="text-ink-tertiary">开始时间</span><span class="text-ink-primary">{{ task.started_at || task.created_at }}</span></div>
+            <div class="flex justify-between"><span class="text-ink-tertiary">结束时间</span><span class="text-ink-primary">{{ task.completed_at || '—' }}</span></div>
+            <div class="flex justify-between gap-2"><span class="text-ink-tertiary flex-shrink-0">输入路径</span><PathText :path="inputLabel" class="font-mono text-ink-primary text-[11px] text-right" /></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 快速预览（按方法差异化）：整行宽度，右边界与任务信息卡片齐平 -->
+      <div class="bg-white border border-surface-border rounded-card p-5">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold text-ink-primary">快速预览</h3>
+          <span class="text-xs text-ink-tertiary">
+            <template v-if="isClahe">第一张图片 · 增强前后对比</template>
+            <template v-else-if="isCrop">第一张原图 · 滑窗分块结果</template>
+          </span>
+        </div>
+
+        <!-- CLAHE：原图 vs 增强后单图对比 -->
+        <div v-if="isClahe">
+          <div v-if="!firstClaheFile" class="py-12 text-center text-xs text-ink-tertiary">
+            暂无预览图
+          </div>
+          <div v-else class="grid grid-cols-2 gap-4">
+            <div>
+              <div class="text-xs text-ink-tertiary mb-2 flex items-center gap-1.5">
+                <Icon name="image" :size="12" /> 原图
+                <span class="ml-auto text-[10px] text-brand-700/70 inline-flex items-center gap-1">
+                  <Icon name="search" :size="10" /> 点击放大
+                </span>
+              </div>
+              <div
+                class="aspect-[4/3] bg-gradient-to-br from-green-50 to-amber-50 rounded-btn flex items-center justify-center border border-surface-border overflow-hidden cursor-zoom-in group relative"
+                @click="openViewer(previewUrl(firstClaheFile.filename, firstSubDir, 'original'), firstClaheFile.filename + ' · 原图')"
+              >
+                <img :src="previewUrl(firstClaheFile.filename, firstSubDir, 'medium')" :alt="firstClaheFile.filename" class="w-full h-full object-contain transition-transform duration-200 group-hover:scale-[1.02]" />
+              </div>
+              <div class="mt-1.5 text-xs font-mono text-ink-primary truncate">{{ firstClaheFile.filename }}</div>
+            </div>
+            <div>
+              <div class="text-xs text-ink-tertiary mb-2 flex items-center gap-1.5">
+                <Icon name="sparkle" :size="12" class="text-brand-700" /> CLAHE 增强后
+                <span class="ml-auto text-[10px] text-brand-700/70 inline-flex items-center gap-1">
+                  <Icon name="search" :size="10" /> 点击放大
+                </span>
+              </div>
+              <div
+                class="aspect-[4/3] bg-gradient-to-br from-emerald-50 to-green-100 rounded-btn flex items-center justify-center border border-brand-100 overflow-hidden cursor-zoom-in group relative"
+                @click="openViewer(previewUrl(firstClaheFile.filename, firstSubDir, 'original'), firstClaheFile.filename + ' · CLAHE')"
+              >
+                <img :src="previewUrl(firstClaheFile.filename, firstSubDir, 'medium')" :alt="firstClaheFile.filename" class="w-full h-full object-contain transition-transform duration-200 group-hover:scale-[1.02]" />
+              </div>
+              <div class="mt-1.5 text-xs font-mono text-ink-primary truncate">{{ firstClaheFile.filename }}</div>
             </div>
           </div>
+          <div class="mt-3 flex items-center text-xs text-ink-tertiary">
+            <Icon name="info" :size="12" class="mr-1.5" /> 同一文件名左为原图、右为增强后；输出目录为 <PathText :path="task.output_path" class="px-1 py-0.5 bg-surface-hover rounded font-mono max-w-[320px]" />
+          </div>
+        </div>
+
+        <!-- Crop：第一张 tile（代理预览） + 该原图对应的所有 tile 网格 -->
+        <div v-else-if="isCrop">
+          <div v-if="!firstCropTile && tileFiles.length === 0" class="py-12 text-center text-xs text-ink-tertiary">
+            暂无预览图
+          </div>
+          <template v-else>
+            <!-- 第一张 tile（可视作第一张图片的左上角分块） -->
+            <div v-if="firstCropTile" class="mb-4">
+              <div class="text-xs text-ink-tertiary mb-2 flex items-center gap-1.5">
+                <Icon name="image" :size="12" /> 第一张图片 · 左上角分块预览
+                <span class="ml-auto text-[10px] text-brand-700/70 inline-flex items-center gap-1">
+                  <Icon name="search" :size="10" /> 点击放大
+                </span>
+              </div>
+              <div
+                class="aspect-[16/9] bg-gradient-to-br from-green-50 to-amber-50 rounded-btn flex items-center justify-center border border-surface-border overflow-hidden cursor-zoom-in group relative"
+                @click="openViewer(previewUrl(firstCropTile.filename, firstSubDir, 'original'), firstCropTile.filename)"
+              >
+                <img :src="previewUrl(firstCropTile.filename, firstSubDir, 'medium')" :alt="firstCropTile.filename" class="w-full h-full object-contain transition-transform duration-200 group-hover:scale-[1.02]" />
+              </div>
+              <div class="mt-1.5 text-xs font-mono text-ink-primary truncate">{{ firstCropTile.filename }}</div>
+            </div>
+
+            <!-- Tile 缩略图网格 -->
+            <div>
+              <div class="text-xs text-ink-tertiary mb-2 flex items-center gap-1.5">
+                <Icon name="grid" :size="12" /> 分块缩略图
+                <span class="text-ink-tertiary">（{{ tileFiles.length }} 张 · 对应原图 stem: <code class="px-1 bg-surface-hover rounded">{{ firstCropOrigStem || '—' }}</code>）</span>
+                <span class="ml-auto text-[10px] text-brand-700/70 inline-flex items-center gap-1">
+                  <Icon name="search" :size="10" /> 单击放大
+                </span>
+              </div>
+              <div v-if="tileFiles.length === 0" class="py-8 text-center text-xs text-ink-tertiary">未找到对应 tile</div>
+              <div v-else class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 xl:grid-cols-8 gap-2">
+                <div
+                  v-for="t in tileFiles"
+                  :key="t.filename"
+                  class="border border-surface-border rounded-btn overflow-hidden cursor-zoom-in group relative"
+                  @click="openViewer(previewUrl(t.filename, firstSubDir, 'original'), t.filename)"
+                >
+                  <div class="aspect-square bg-gradient-to-br from-green-50 to-amber-50">
+                    <img :src="previewUrl(t.filename, firstSubDir, 'thumbnail')" :alt="t.filename" class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105" loading="lazy" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
 

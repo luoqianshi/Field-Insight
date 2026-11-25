@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-11-25T05:23:44Z",
-  "updated_at": "2026-11-25T15:53:13Z",
+  "updated_at": "2026-11-25T16:49:37Z",
   "files": {
     ".gitattributes": {
       "role": "index",
@@ -839,9 +839,9 @@
     },
     "LOG.md": {
       "role": "index",
-      "sha256": "bb1658b7f707a7b7471a925873591e7f796cb750909f970eb63aba8b5e151b88",
-      "size": 6543,
-      "normalized_sha256": "d697a1c4e872c3d35669fc7c063bb9989b415214d1de5fe58f8841e8a9961fa9"
+      "sha256": "8793697a0d4351acbd66295a3135f6979a54b068160e85e4ba84e11aa7cb3b96",
+      "size": 6785,
+      "normalized_sha256": "965a1da6538a30fb8c7fdaaa30857f96e872c6e1b1479baa162d6b4fc69fa658"
     },
     "README.md": {
       "role": "index",
@@ -857,9 +857,9 @@
     },
     "aoci.code.txt": {
       "role": "index",
-      "sha256": "5ba80e30ec50d21c114d9b4684447f9b4dca46642fdebf3effc9badb5163b634",
-      "size": 91948,
-      "normalized_sha256": "5ba80e30ec50d21c114d9b4684447f9b4dca46642fdebf3effc9badb5163b634"
+      "sha256": "dcb84ad1207442e3bdb750279872be20a9b97286157483d103e642b5c34e18ca",
+      "size": 92342,
+      "normalized_sha256": "dcb84ad1207442e3bdb750279872be20a9b97286157483d103e642b5c34e18ca"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -933,9 +933,9 @@
     },
     "backend/api/settings_api.py": {
       "role": "index",
-      "sha256": "e6cd935c899cd51b4238314e1e6f911c932109db7b7dd1e8ba4f5d5aa1d6ac14",
-      "size": 7910,
-      "normalized_sha256": "e6cd935c899cd51b4238314e1e6f911c932109db7b7dd1e8ba4f5d5aa1d6ac14"
+      "sha256": "0aaefe37937473bc36372e9442af7fd803635d05bdd25ccf42aadbde09bcc569",
+      "size": 9432,
+      "normalized_sha256": "0aaefe37937473bc36372e9442af7fd803635d05bdd25ccf42aadbde09bcc569"
     },
     "backend/app.py": {
       "role": "index",
@@ -1213,9 +1213,9 @@
     },
     "backend/tests/test_settings_api.py": {
       "role": "observe",
-      "sha256": "9f8f1fd7057f82791304ef1eb1cd2644b89ccfbcd6a418a2a4323580fa11a094",
-      "size": 6414,
-      "normalized_sha256": "9f8f1fd7057f82791304ef1eb1cd2644b89ccfbcd6a418a2a4323580fa11a094"
+      "sha256": "2fecd38eae0cf1162e865e891bc67c4f82df1dbf0e6ef0fc124f77fa242b4b29",
+      "size": 7524,
+      "normalized_sha256": "2fecd38eae0cf1162e865e891bc67c4f82df1dbf0e6ef0fc124f77fa242b4b29"
     },
     "backend/tests/test_storage_migration.py": {
       "role": "observe",
@@ -2481,9 +2481,9 @@
     },
     "frontend/src/api/settings.ts": {
       "role": "index",
-      "sha256": "c2520a225670075000a0b2856d00e54969e98a4feb3540d0f0a4244b3c4714fe",
-      "size": 3596,
-      "normalized_sha256": "c2520a225670075000a0b2856d00e54969e98a4feb3540d0f0a4244b3c4714fe"
+      "sha256": "fa2f04e2403bcd1550410dc82558a65dd772d5f6ef7790f057da4e9d56496b21",
+      "size": 3810,
+      "normalized_sha256": "fa2f04e2403bcd1550410dc82558a65dd772d5f6ef7790f057da4e9d56496b21"
     },
     "frontend/src/assets/styles.css": {
       "role": "index",
@@ -2709,9 +2709,9 @@
     },
     "frontend/src/views/process/TaskDetail.vue": {
       "role": "index",
-      "sha256": "0c7f23f71d5ff2b1b6cefe72f53ecd490e24adaa07b9612dec2e0ffd1bfca8b5",
-      "size": 21496,
-      "normalized_sha256": "0c7f23f71d5ff2b1b6cefe72f53ecd490e24adaa07b9612dec2e0ffd1bfca8b5"
+      "sha256": "68ab4898c51a1d8c49731226667c217302646d1e2e4707ecc20ceff0f06cb531",
+      "size": 19763,
+      "normalized_sha256": "68ab4898c51a1d8c49731226667c217302646d1e2e4707ecc20ceff0f06cb531"
     },
     "frontend/src/views/process/TaskNew.vue": {
       "role": "index",
@@ -2727,9 +2727,9 @@
     },
     "frontend/src/views/settings/Settings.vue": {
       "role": "index",
-      "sha256": "a9381061b3252326f6b31fa8e247297196b42d5af3d1accef9d6d455adafbe4c",
-      "size": 15923,
-      "normalized_sha256": "a9381061b3252326f6b31fa8e247297196b42d5af3d1accef9d6d455adafbe4c"
+      "sha256": "9e3985335723dfaf197568947eaca9748c44b6c8caa3d2cb0c385c3bef0aa6a4",
+      "size": 19182,
+      "normalized_sha256": "9e3985335723dfaf197568947eaca9748c44b6c8caa3d2cb0c385c3bef0aa6a4"
     },
     "frontend/tailwind.config.js": {
       "role": "index",
