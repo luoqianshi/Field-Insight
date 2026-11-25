@@ -1,7 +1,7 @@
 # 版本管理与发版计划（VERSIONS）
 
 > 本文件是「田间智瞰」项目版本历史与发版计划的单一索引。
-> 2026-11-25 版本编号体系重构：旧桌面版本线 **v1.0.0 / v1.1.0 全部重置并入 V0.5.5 基线**；2026-11-24 的「无人机型号选择 + 地块地理位置」更新定为 **V0.5.6（当前基线）**。历史文档（`docs/desktop-build-guide.md`、`.lqs/` 报告等）保留旧编号原文，以本文映射表对照，不回改。
+> 2026-11-25 版本编号体系重构：旧桌面版本线 **v1.0.0 / v1.1.0 全部重置并入 V0.5.5 基线**；2026-11-24 的「无人机型号选择 + 地块地理位置」更新定为 **V0.5.6**；2026-11-25 的「数据处理模块风险收敛与长路径显示修复」定为 **V0.5.7（当前基线）**。历史文档（`docs/desktop-build-guide.md`、`.lqs/` 报告等）保留旧编号原文，以本文映射表对照，不回改。
 > 历史细节来源：`docs/prd/`（PRD v1~v7）、`docs/update_report/`（001~012）、`docs/bug_report/`（001~011）、`LOG.md`、git 提交树（追溯重构，V0.5.5 及以前版本号为回填编号，非当时实际发布号）。
 
 ---
@@ -14,7 +14,7 @@
 | 升位规则 | `0.x` 期：模块级功能里程碑 → MINOR；同模块内迭代/优化/修复 → PATCH |
 | 版本单一来源 | `electron/package.json` 的 `version`；安装包名、exe 属性、`/api/health`、「设置 → 关于」均读该值 |
 | 版本透传链 | 桌面壳以 `TJZK_APP_VERSION` 环境变量传给冻结后端 → `backend/config.py` 的 `APP_VERSION`（开发态回退读 `electron/package.json`） |
-| Git tag | 注解 tag `vX.Y.Z`，与 `electron/package.json` 对齐；**截至 V0.5.6 仓库尚无任何 tag**（旧 v1.0.0/v1.1.0 未打过 tag、未发 GitHub Release），`v0.5.6` 将是新编号体系首个 tag |
+| Git tag | 注解 tag `vX.Y.Z`，与 `electron/package.json` 对齐；**截至 V0.5.7 仓库尚无任何 tag**（旧 v1.0.0/v1.1.0 未打过 tag、未发 GitHub Release），`v0.5.7` 将是新编号体系首个 tag |
 | 提交规范 | Conventional Commits（见 AGENTS.md） |
 | 记录分工 | `VERSIONS.md`＝版本级索引；`LOG.md`＝任务级一行日志；`docs/update_report/`、`docs/bug_report/`＝详细归档；`docs/prd/`＝需求基线 |
 | 桌面发布流程 | 冻结验证（pytest → frontend build → 载荷重建 → smoke）→ 版本提交 → 注解 tag → 走代理推送（AGENTS.md Git 工作流）→ 产物 + SHA256 → `gh release create` |
@@ -30,13 +30,23 @@
 
 ## 二、版本历史（追溯重构）
 
-### V0.5.6 —— 当前基线（2026-11-24 ~ ，开发中，未发布）
+### V0.5.7 —— 当前基线（2026-11-25，桌面端与安装包已产出）
+
+**主题：数据处理模块风险收敛——输入源准入、冗余信息清理与长路径显示**
+
+- **移除自定义目录输入源**（`01811e4`，TaskNew.vue + processing_api.py）：新建任务仅支持「已登记架次」与「已有加工产物」两类输入；后端 `_validate_input_paths` 在 CLAHE/裁切提交前强制校验，仅接受 `data/`（上传数据）或 `output/`（加工产物）根下目录，`resolve()` 防路径穿越，自定义目录直接 400，杜绝任意路径注入风险。
+- **清理详情页静态占位信息**（`01811e4`，TaskDetail.vue）：删除写死的「创建者 李研究员」「设备 CPU · 8 workers」「平均速度 0.65 s/张」与失效的「下游数据集 甘蔗幼苗 v1.2.0」入口；CLAHE 统计卡收敛为 4 张真实指标，裁切保留真实「子图总数」。
+- **长路径显示统一修复**（`01811e4`，新增 `frontend/src/components/common/PathText.vue`）：超过两级的路径仅显示末两级并以 `…/` 前缀缩略，单行截断防列溢出；悬停提示完整路径、点击展开/收起。接入处理任务列表、任务详情、新建任务向导、加工数据列表与详情页，覆盖 CLAHE 与滑窗裁切两种处理操作。
+- **测试与环境**：processing 相关测试同步改造输入源夹具并新增安全用例（自定义目录 400 / 加工产物可再加工），后端全套 **179 passed**；构建环境重建为 `C:\Users\lqs\UAVDesktopBuild\venv`（Python 3.8.20 + PyInstaller 6.22.3 + **torch/torchvision/torchaudio 2.1.0/0.16.0/2.1.0 +cpu**，CUDA 版不可分发）。
+- **产物与验证**：Electron 便携目录 `electron/dist/win-unpacked`（`TianJianZhiKan.exe` 文件版本 0.5.7）与 NSIS 安装包 `TianJianZhiKan-v0.5.7-win-x64-setup.exe`（365.1 MB，SHA256 `86224BF400808295C9D94E87088856AE5CC4A3D34C2EFDC70443E1538B1ED898`）；打包版与静默安装版均冒烟通过（health v0.5.7 / 11 模型 / 单图推理成功），静默安装后快捷方式与卸载注册表项随卸载清理干净。后端载荷 851.5 MB / 3382 文件。
+
+### V0.5.6 —— 架次登记增强（2026-11-24 ~ 2026-11-25）
 
 **主题：架次登记增强——无人机型号选择 + 地块地理位置信息**
 
 - **无人机型号预设更新与自定义持久化**（`a03c60b`，BatchNew.vue）：预设收敛为农田监测设备（移除 DJI Agras T 系列喷洒机型，新增极飞 M2000/M500 2025 款巡田无人机等）；选「其他」支持自填型号，持久化后加入预选列表。
 - **地块信息升级为地理位置信息**（`20d8fb1`，geo_api + GeoLocationEditor）：Leaflet 地图选点弹窗；DJI 图片 EXIF GPS 提取接口；架次存储 WGS84 经纬度/海拔/来源。
-- 基线后增量（2026-11-25，随本版本发布）：
+- 基线后增量（2026-11-25，并入 V0.5.7 发布）：
   - `5c87590` fix：补齐 BatchDetail.vue 缺失的 DataSubTabs 导入；Electron 窗口最小尺寸对齐规范 1100×760。
   - `be61106`/`66f3be3` chore：接入 AOCI-CODE v0.2.0-rc4 仓库认知资产（117 条 Code Entry 索引）。
   - `39482b1` chore：清理 `reports/` 报告相关冗余图片与文件。
@@ -135,14 +145,14 @@
 
 ## 三、发版计划
 
-### V0.5.6 发布清单（待执行）
+### V0.5.7 发布清单（进行中）
 
-1. 冻结验证：`cd backend; python -m pytest -v` 全绿 → `cd frontend; npm run build` → `electron\build-backend.ps1 -PythonExe <构建环境 python>` 重建载荷 → `cd electron; npm run smoke`。
-2. 提交版本号变更（`electron/package.json` 已置 `0.5.6`）。
-3. 打注解 tag `v0.5.6`（新编号体系首个 tag；旧 v1.0.0/v1.1.0 无历史 tag 需处理）。
+1. 冻结验证：`cd backend; python -m pytest -v` 全绿 → `cd frontend; npm run build` → `electron\build-backend.ps1 -PythonExe C:\Users\lqs\UAVDesktopBuild\venv\Scripts\python.exe` 重建载荷 → `cd electron; npm run smoke`。
+2. 提交版本号变更（`electron/package.json` 已置 `0.5.7`）与本文件更新。
+3. 打注解 tag `v0.5.7`（新编号体系首个正式 tag；旧 v1.0.0/v1.1.0 无历史 tag）。
 4. 按 AGENTS.md Git 工作流走本地系统代理推送。
-5. 产物：`npm run build:dir` → `TianJianZhiKan-v0.5.6-win-x64.zip`（win-unpacked 整目录压缩）+ SHA256；如需安装包 `npm run build:installer`。
-6. 干净目录解压验证 → `gh release create v0.5.6` 上传产物（Release notes 注明未签名 SmartScreen「更多信息 → 仍要运行」）。
+5. 产物：`npm run build:dir` → `win-unpacked` 便携目录；`npm run build:installer` → `TianJianZhiKan-v0.5.7-win-x64-setup.exe`；如需 zip 则整目录压缩并附 SHA256。
+6. 干净目录解压/安装验证 → `gh release create v0.5.7` 上传产物（Release notes 注明未签名 SmartScreen「更多信息 → 仍要运行」）。
 
 ### 后续版本规划（候选，按优先级）
 

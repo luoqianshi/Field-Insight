@@ -47,3 +47,4 @@
 - [2026-11-25 18:05] docs(repo): 文档目录规范化收口——bug/update 报告、PRD、问答记录统一迁入 docs/，同步更新 bug_report/update_report SKILL 输出目录、AGENTS/README/VERSIONS 路径引用与目录树
 - [2026-11-25 21:05] docs(qna): 新增 DJI Mavic 3M 图像 EXIF 扩展信息解析与农业巡检价值分析（docs/qna_record/）
 - [2026-11-25 21:53] fix(process): 移除自定义目录输入源并加后端校验，删详情静态冗余字段，长路径缩略显示
+- [2026-11-25 23:50] build(desktop): 版本升至 0.5.7 并产出 Electron 便携目录与 NSIS 安装包（CPU torch 载荷重建/冒烟与静默安装卸载验证，VERSIONS.md 同步）
