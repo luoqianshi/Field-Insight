@@ -41,3 +41,4 @@
 - [2026-11-24 15:45] feat(data): 地块信息升级为地理位置信息——Leaflet 地图选点弹窗 + DJI 图片 EXIF GPS 提取接口，架次存 WGS84 经纬度/海拔/来源（geo_api/GeoLocationEditor）
 - [2026-11-25 13:33] chore(aoci): 安装 AOCI-CODE v0.2.0-rc4（校验和+attestation 双层校验通过）并完成 init/scan 初始化，生成认知资产骨架与基线，MCP 接入待 Trae 重启生效（aoci.exe @ %LOCALAPPDATA%\Programs\aoci）
 - [2026-11-25 15:07] chore(aoci): MCP 接入后经 Guide 完成首次索引创作——117 条 Code Entry（3 并行批+末批）+ Root 概览，verify/check 对齐
+- [2026-11-25 15:50] fix(desktop,data): 补齐 BatchDetail.vue 缺失的 DataSubTabs 导入；Electron 窗口最小尺寸由 1024×620 对齐规范 1100×760（小屏回退），前端已重新 build

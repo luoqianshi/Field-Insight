@@ -274,11 +274,14 @@ app.whenReady().then(async () => {
     const area = screen.getPrimaryDisplay().workAreaSize;
     const width = Math.max(1024, Math.min(1440, area.width - 80));
     const height = Math.max(620, Math.min(900, area.height - 80));
+    // 最小尺寸按规范 1100×760，但小屏笔记本放不下时回退到初始尺寸，避免窗口超出工作区
+    const minWidth = Math.min(1100, width);
+    const minHeight = Math.min(760, height);
     win = new BrowserWindow({
       width,
       height,
-      minWidth: 1024,
-      minHeight: 620,
+      minWidth,
+      minHeight,
       center: true,
       show: false,
       title: '田间智瞰',

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import AppLayout from '@/components/layout/AppLayout.vue'
+import DataSubTabs from '@/components/layout/DataSubTabs.vue'
 import Icon from '@/components/common/Icon.vue'
 import GeoLocationEditor, { type GeoValue } from '@/components/data/GeoLocationEditor.vue'
 import { batchesApi, type Batch, type BatchImage } from '@/api/batches'
