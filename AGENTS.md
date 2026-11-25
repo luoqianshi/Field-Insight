@@ -19,18 +19,18 @@
 | `frontend/` | Vue 3 前端，Web/桌面共享；构建产物 → `backend/static/` | 跟踪 |
 | `electron/` | 桌面壳唯一方案（main/preload/载荷 spec/构建脚本）；产物目录 gitignore | 源码应跟踪 |
 | `config/` `models/` `data/` `output/` `datasets/` `results/` | 运行目录，由 `backend/config.py` 锚定仓库根，**禁止移动/改名** | config 跟踪，其余忽略 |
-| `docs/sdd/{specs,plans,prd}` | 正式 SDD 文档唯一跟踪目录 | 跟踪 |
+| `docs/` | 文档中心：`sdd/{specs,plans}` 正式 SDD、`prd/` 需求基线、`bug_report/`、`update_report/` 报告归档、`qna_record/` 分析记录 | 跟踪 |
 | `reports/` | 轻量交付物（HTML 报告/截图/架构图 PPTX+PNG） | 跟踪 |
 | `paper_chapter/` `remotion/` | 论文/视频大文件工作区 | 忽略 |
-| `.lqs/` | 私有工作区：PRD 草稿/原型/图标设计/bug 与更新报告/AI 分析归档 | 忽略 |
+| `.lqs/` | 私有工作区：PRD 草稿/原型/图标设计/AI 分析归档 | 忽略 |
 | `.trae/` `.codex/` `.qoder/` `.workbuddy/` | AI 工具自有 scratch 目录，内部不手动迁移 | 忽略（`.trae/skills/` 除外） |
 | 根文件 | README / AGENTS / LOG / start.ps1 / requirements*.txt | 跟踪 |
 
 ### 新文件落位规则
 
-1. **正式 SDD**（spec/plan/PRD 定稿）→ `docs/sdd/{specs,plans,prd}/`，命名 `YYYY-MM-DD-<topic>.md`；草稿与过程版 → `.lqs/{prd,specs,plans}/`。
+1. **正式 SDD 文档**（spec/plan 定稿）→ `docs/sdd/{specs,plans}/`，命名 `YYYY-MM-DD-<topic>.md`；PRD 基线 → `docs/prd/`；草稿与过程版 → `.lqs/{prd,specs,plans}/`。
 2. **AI 分析/验证/调研产出** → `.lqs/<YYYY-MM-DD>/<topic>/outputs/`；**禁止在仓库根创建日期目录或散放分析文件**。工具自有目录（如 `.trae/documents/`）遵循工具默认路径，不手动迁移其内部。
-3. **Bug/更新报告** → `.lqs/bug_report/`、`.lqs/update_report/`（skill 默认路径，命名见各 SKILL.md）。
+3. **Bug/更新报告** → `docs/bug_report/`、`docs/update_report/`（skill 默认路径，命名见各 SKILL.md）；**分析/问答记录** → `docs/qna_record/`。
 4. **报告交付物** → `reports/`（轻量 HTML/PNG/PPTX 可跟踪）；大媒体（视频/论文图批）→ `remotion/`、`paper_chapter/`（忽略）。
 5. **静态资源**：Web 运行图标 → `frontend/public/`；内联图标 → `Icon.vue`；设计源稿 → `.lqs/icon_design/`；桌面图标 → `electron/build/`。**禁止在 `frontend/assets/` 或仓库根放非运行时资源。**
 6. **测试图片/fixture** → `backend/tests/` 或 `.lqs/imgs/`，禁止仓库根。
@@ -91,7 +91,7 @@ npm run build:installer                   # → dist/TianJianZhiKan-v{version}-w
 - **粒度**：每个用户任务一条；同一任务内多次编辑、多个提交合并为一条，不按文件逐条记录。
 - **写入**：追加到文件末尾（时间正序）；历史条目不改不删，纠错以新条目说明。
 - **Git**：`LOG.md` 纳入版本控制（属改动文档而非运行日志），与该任务改动一并提交。
-- **与其他记录的关系**：commit message 是提交级明细，`.lqs/update_report/` 是详细归档，LOG.md 是任务级一行索引，三者互补不互替。
+- **与其他记录的关系**：commit message 是提交级明细，`docs/update_report/` 是详细归档，LOG.md 是任务级一行索引，三者互补不互替。
 
 ## 桌面端研发细则（Electron）
 
@@ -125,7 +125,7 @@ npm run build:installer                   # → dist/TianJianZhiKan-v{version}-w
 ### 发布约定
 - 版本单一来源：`electron/package.json` 的 `version`；git tag `vX.Y.Z`（注解 tag）与之对齐。
 - 仅发布 Windows 压缩包 `TianJianZhiKan-v{version}-win-x64.zip`；`dist/win-unpacked` 是免安装原材料，整目录压缩，不逐个挑 exe。
-- `publish: null` 手动发布、无自动更新；zip target/artifactName 配置已规划未实施（见 `.lqs/update_report/012`）；NSIS 安装包（向导式/自定义目录/当前用户/桌面与开始菜单快捷方式）自 v1.1.0 起可用 `npm run build:installer` 产出，验证与构建说明见 [docs/desktop-build-guide.md](docs/desktop-build-guide.md)。
+- `publish: null` 手动发布、无自动更新；zip target/artifactName 配置已规划未实施（见 `docs/update_report/012`）；NSIS 安装包（向导式/自定义目录/当前用户/桌面与开始菜单快捷方式）自 v1.1.0 起可用 `npm run build:installer` 产出，验证与构建说明见 [docs/desktop-build-guide.md](docs/desktop-build-guide.md)。
 - 未代码签名：SmartScreen「未知发布者」属预期，Release notes 须写明「更多信息 → 仍要运行」。
 - 流程：冻结验证（pytest/build/smoke）→ 版本提交 → 重建产物链 → 干净目录解压验证 + SHA256 → 注解 tag → 按 Git 工作流走代理推送 → `gh release create` 上传 zip + sha256。
 

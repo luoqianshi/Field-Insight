@@ -73,7 +73,13 @@ project_root/
 ├── output/                     # 数据处理产物（output/{task_id}/）
 ├── datasets/                   # 数据集注册（datasets.yaml）+ 导入数据集
 ├── results/                    # 计数结果输出
-├── docs/sdd/                   # 正式 SDD 文档唯一跟踪目录（specs + plans + prd）
+├── docs/                       # 文档中心（跟踪）
+│   ├── sdd/{specs,plans}/      # 正式 SDD 设计文档与实施计划
+│   ├── prd/                    # PRD 需求基线（v1~v7）
+│   ├── bug_report/             # Bug 修复报告归档
+│   ├── update_report/          # 功能更新报告归档
+│   ├── qna_record/             # 问答/分析记录
+│   └── desktop-build-guide.md  # 桌面端构建与安装说明
 ├── reports/                    # 报告交付物（HTML 报告/截图/架构图）
 ├── AGENTS.md                   # AI 编码代理项目指引（目录规范/Git 工作流）
 ├── DEPLOYMENT.md               # 线上部署指南（Docker/Nginx/HTTPS/CI-CD）
@@ -83,15 +89,15 @@ project_root/
 └── README.md
 ```
 
-> 私有工作区 `.lqs/`（PRD 草稿/原型/图标设计/bug 与更新报告/AI 分析归档）与 AI 工具目录（`.trae/`、`.codex/`、`.qoder/`、`.workbuddy/` 等）不入库；大媒体工作区 `paper_chapter/`、`remotion/` 同样忽略。新文件落位规则见 [AGENTS.md](AGENTS.md)「目录规范」章节。
+> 私有工作区 `.lqs/`（PRD 草稿/原型/图标设计/AI 分析归档）与 AI 工具目录（`.trae/`、`.codex/`、`.qoder/`、`.workbuddy/` 等）不入库；大媒体工作区 `paper_chapter/`、`remotion/` 同样忽略。新文件落位规则见 [AGENTS.md](AGENTS.md)「目录规范」章节。
 
 ## 目录治理（SDD 方案）
 
 仓库按 SDD（Spec-Driven Development）方案统一管理文档与文件落位，规则固化在 [AGENTS.md](AGENTS.md)：
 
-- **正式 SDD 文档**（spec/plan/PRD 定稿）唯一跟踪目录为 `docs/sdd/{specs,plans,prd}/`，命名 `YYYY-MM-DD-<topic>.md`；草稿与过程版放 `.lqs/{prd,specs,plans}/`。
+- **正式 SDD 文档**（spec/plan 定稿）唯一跟踪目录为 `docs/sdd/{specs,plans}/`，命名 `YYYY-MM-DD-<topic>.md`；PRD 需求基线归档于 `docs/prd/`；草稿与过程版放 `.lqs/{prd,specs,plans}/`。
 - **AI 分析/验证/调研产出** → `.lqs/<YYYY-MM-DD>/<topic>/outputs/`，禁止在仓库根散放分析文件或创建日期目录。
-- **Bug/更新报告** → `.lqs/bug_report/`、`.lqs/update_report/`；**轻量交付物**（HTML/PNG/PPTX）→ `reports/`。
+- **Bug/更新报告** → `docs/bug_report/`、`docs/update_report/`；**问答/分析记录** → `docs/qna_record/`；**轻量交付物**（HTML/PNG/PPTX）→ `reports/`。
 - **运行目录**（`config/ models/ data/ output/ datasets/ results/`）由 `backend/config.py` 锚定：Web 态锚定仓库根，桌面冻结态锚定用户数据根，**禁止移动/改名**。
 - **Git 卫生**：`.gitignore` 运行目录必须根锚定（`/data/` 而非 `data/`），防止误忽略 `frontend/src/views/data/` 等同名子目录；禁止跟踪日志、大图片、模型权重、运行数据与私有草稿。
 
@@ -412,3 +418,5 @@ datasets/
 - [AGENTS.md](AGENTS.md) —— AI 编码代理项目指引（目录规范/代码约定/Git 工作流）
 - [docs/desktop-build-guide.md](docs/desktop-build-guide.md) —— 桌面端构建、安装包生成与验证说明
 - [docs/sdd/](docs/sdd/) —— 正式 SDD 文档（数据管理/数据处理/数据集管理 specs + plans）
+- [docs/prd/](docs/prd/) —— PRD 需求基线（v1~v7）
+- [docs/bug_report/](docs/bug_report/) / [docs/update_report/](docs/update_report/) —— Bug 修复与功能更新报告归档

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-11-25T05:23:44Z",
-  "updated_at": "2026-11-25T09:23:11Z",
+  "updated_at": "2026-11-25T10:10:14Z",
   "files": {
     ".gitattributes": {
       "role": "index",
@@ -821,45 +821,45 @@
     },
     ".trae/skills/bug_report/SKILL.md": {
       "role": "index",
-      "sha256": "95f67adcdff2b64d2e0b5db6fc0688fc7551afac53544211cedd8ebcb8f71232",
+      "sha256": "eab6774c23d226d1a3706d9e4fddbceaffbcd4d07b4193838e4092fa61f9370d",
       "size": 3210,
-      "normalized_sha256": "95f67adcdff2b64d2e0b5db6fc0688fc7551afac53544211cedd8ebcb8f71232"
+      "normalized_sha256": "eab6774c23d226d1a3706d9e4fddbceaffbcd4d07b4193838e4092fa61f9370d"
     },
     ".trae/skills/update_report/SKILL.md": {
       "role": "index",
-      "sha256": "026e077881f05091713c5a657f55b85fde3ace68808a943c1360f5fd012a3686",
+      "sha256": "7a3e9ba7eb8cf36281521242e48a3cbc61e93f833b1fa207a0983e2951fbd984",
       "size": 4738,
-      "normalized_sha256": "026e077881f05091713c5a657f55b85fde3ace68808a943c1360f5fd012a3686"
+      "normalized_sha256": "7a3e9ba7eb8cf36281521242e48a3cbc61e93f833b1fa207a0983e2951fbd984"
     },
     "AGENTS.md": {
       "role": "index",
-      "sha256": "becd958107df4d5bfb9e312df212131a17882e712b1d004d58398ecf35743971",
-      "size": 28234,
-      "normalized_sha256": "75c50e60d6b07a010c29a4f917e9a95d0fa6f60f0ddb5d3cd1c1ef03aa356a49"
+      "sha256": "c23a3f4e5f5dd1a63f3c0479fa3476e5adf7f2b1ad4b0f9ecfdda06fcc2df448",
+      "size": 28379,
+      "normalized_sha256": "14d40a7d32141dd56263eddc0d95497df9d80a94101d69940b5ff078d417abe8"
     },
     "LOG.md": {
       "role": "index",
-      "sha256": "0af0b604f876fb1e1dce937b0b6c9a90b2094de52422b3392d97c143e5494266",
-      "size": 5851,
-      "normalized_sha256": "0af0b604f876fb1e1dce937b0b6c9a90b2094de52422b3392d97c143e5494266"
+      "sha256": "34fc0a2227e7eb5f8d8ab76acf83efe18288000d10daef2bdc5f8052fb7d41a7",
+      "size": 6083,
+      "normalized_sha256": "34fc0a2227e7eb5f8d8ab76acf83efe18288000d10daef2bdc5f8052fb7d41a7"
     },
     "README.md": {
       "role": "index",
-      "sha256": "453481ad7405494c787fa4af424977b4ba6d47528ba31eeac1a5efd656c8c754",
-      "size": 26677,
-      "normalized_sha256": "453481ad7405494c787fa4af424977b4ba6d47528ba31eeac1a5efd656c8c754"
+      "sha256": "49c4ca313fac7cb887b01614fd23a4c233f3cddfba564dcc44a711943c77bcd0",
+      "size": 27309,
+      "normalized_sha256": "49c4ca313fac7cb887b01614fd23a4c233f3cddfba564dcc44a711943c77bcd0"
     },
     "VERSIONS.md": {
       "role": "index",
-      "sha256": "0fee5e28dc5fab67207dafc269ce59a412f6f7288cb3d28e857d318cd25b27b5",
+      "sha256": "a5cfbf336af59c2d498601fc8202c18d7896fe37049b82f71c85041aeb4f8423",
       "size": 16687,
-      "normalized_sha256": "0fee5e28dc5fab67207dafc269ce59a412f6f7288cb3d28e857d318cd25b27b5"
+      "normalized_sha256": "a5cfbf336af59c2d498601fc8202c18d7896fe37049b82f71c85041aeb4f8423"
     },
     "aoci.code.txt": {
       "role": "index",
-      "sha256": "49adacc46743716403de314fe5569b8cd4066c492c5b7f91115812c75bef45e6",
-      "size": 72407,
-      "normalized_sha256": "49adacc46743716403de314fe5569b8cd4066c492c5b7f91115812c75bef45e6"
+      "sha256": "3f77149609db025cdf64dfd398ac6d89ee30b0373bce083b6bc969c71b624589",
+      "size": 90407,
+      "normalized_sha256": "3f77149609db025cdf64dfd398ac6d89ee30b0373bce083b6bc969c71b624589"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -1247,11 +1247,131 @@
       "size": 2953,
       "normalized_sha256": "49608e58978c659cf86f7cdd0931359ee266f813b80685e13b87342e4958fda1"
     },
+    "docs/bug_report/001_20260809_161809_模型清单展示异常与算法注册500修复.md": {
+      "role": "index",
+      "sha256": "b8f466762ba933b7123e1eec9f8c1b6e2952bbac99dda730ea16ead2765114ba",
+      "size": 8818,
+      "normalized_sha256": "b8f466762ba933b7123e1eec9f8c1b6e2952bbac99dda730ea16ead2765114ba"
+    },
+    "docs/bug_report/002_20260809_170349_前端3000端口无数据显示.md": {
+      "role": "index",
+      "sha256": "6f08a350bd43447925ec021366586f49f23dda5100ae272f804b6f201fdd1d52",
+      "size": 5324,
+      "normalized_sha256": "6f08a350bd43447925ec021366586f49f23dda5100ae272f804b6f201fdd1d52"
+    },
+    "docs/bug_report/003_20260809_201100_检测推理device无效值修复.md": {
+      "role": "index",
+      "sha256": "161105da272361439f189df95407ca4864e2679693d0f8ffe7118c06d1d06f4c",
+      "size": 8741,
+      "normalized_sha256": "161105da272361439f189df95407ca4864e2679693d0f8ffe7118c06d1d06f4c"
+    },
+    "docs/bug_report/004_20260809_202933_前端导航栏数据集管理连带高亮数据管理修复.md": {
+      "role": "index",
+      "sha256": "a18713b5ba7be5c09dd6a55a9a846bea99b22405a74090fecea30585b6efaf73",
+      "size": 4804,
+      "normalized_sha256": "a18713b5ba7be5c09dd6a55a9a846bea99b22405a74090fecea30585b6efaf73"
+    },
+    "docs/bug_report/005_20260809_231237_计数与检测结果图偏蓝及分块感知修复.md": {
+      "role": "index",
+      "sha256": "867b0dac37d68742cc00be142d913d0e76beaacce5ce9d9a113efd3c02d2b2c1",
+      "size": 7149,
+      "normalized_sha256": "867b0dac37d68742cc00be142d913d0e76beaacce5ce9d9a113efd3c02d2b2c1"
+    },
+    "docs/bug_report/006_20260811_092632_计数工作台颜色通道反转致检测失准.md": {
+      "role": "index",
+      "sha256": "955f4e1263d45b384d42fa251363ef52e5ca30868c3effb38b639b894fafe885",
+      "size": 7845,
+      "normalized_sha256": "955f4e1263d45b384d42fa251363ef52e5ca30868c3effb38b639b894fafe885"
+    },
+    "docs/bug_report/007_20260811_232527_batch_registry兼容Python38内置泛型崩溃修复.md": {
+      "role": "index",
+      "sha256": "6e4d235bd58116aa970ce5ad51b4e2dced5fc77ac69101f5f3ee7a23232a0566",
+      "size": 5107,
+      "normalized_sha256": "6e4d235bd58116aa970ce5ad51b4e2dced5fc77ac69101f5f3ee7a23232a0566"
+    },
+    "docs/bug_report/008_20260812_225927_数据处理增强与UI多项修复.md": {
+      "role": "index",
+      "sha256": "f71d1518149297cca978a989335d1a0a874f9789e60a20ca773e8d2fbed40255",
+      "size": 7896,
+      "normalized_sha256": "f71d1518149297cca978a989335d1a0a874f9789e60a20ca773e8d2fbed40255"
+    },
+    "docs/bug_report/009_20260813_182342_侧边栏随主内容滚动悬空修复.md": {
+      "role": "index",
+      "sha256": "3085ce1a8c6e657bdde86cd3af6bd0b61539ab6f2e9fb6392f9d22fcccb64414",
+      "size": 6257,
+      "normalized_sha256": "3085ce1a8c6e657bdde86cd3af6bd0b61539ab6f2e9fb6392f9d22fcccb64414"
+    },
+    "docs/bug_report/010_20260814_223545_dataset_formats兼容Python38联合类型崩溃修复.md": {
+      "role": "index",
+      "sha256": "7ee83acad4d3dd5e06a76b849e573abf5f852db049a9c46476e7fb52d9c59a2c",
+      "size": 4240,
+      "normalized_sha256": "7ee83acad4d3dd5e06a76b849e573abf5f852db049a9c46476e7fb52d9c59a2c"
+    },
+    "docs/bug_report/011_20260814_233654_数据集详情页统计分析图表空白修复.md": {
+      "role": "index",
+      "sha256": "ed3666bf2f55e3b6c9e137d7c7aef7827e32b8f2a4a4f2ed4a606679028e3163",
+      "size": 5447,
+      "normalized_sha256": "ed3666bf2f55e3b6c9e137d7c7aef7827e32b8f2a4a4f2ed4a606679028e3163"
+    },
     "docs/desktop-build-guide.md": {
       "role": "index",
       "sha256": "f620deb2b5a5e3fe99e94782c0b1f45e8d0c463b0cd41cd24067aefe09d40bfc",
       "size": 9812,
       "normalized_sha256": "f620deb2b5a5e3fe99e94782c0b1f45e8d0c463b0cd41cd24067aefe09d40bfc"
+    },
+    "docs/prd/PRD_基于无人机图像的大田农作物智能监测与管理系统_v1.md": {
+      "role": "index",
+      "sha256": "ee3cfad9c9cf286d3411d7de4914df9db35cde9266cdbdad005c392f8bda91fe",
+      "size": 53399,
+      "normalized_sha256": "ee3cfad9c9cf286d3411d7de4914df9db35cde9266cdbdad005c392f8bda91fe"
+    },
+    "docs/prd/PRD_基于无人机图像的大田农作物智能监测与管理系统_v2.md": {
+      "role": "index",
+      "sha256": "79e0ef49d9413aa760e453f2356b7c647f39a633310ecf8017312d5697447299",
+      "size": 53381,
+      "normalized_sha256": "79e0ef49d9413aa760e453f2356b7c647f39a633310ecf8017312d5697447299"
+    },
+    "docs/prd/PRD_基于无人机图像的大田农作物智能监测与管理系统_v3.md": {
+      "role": "index",
+      "sha256": "82dc2b359548ab4cfe3239a4e173a7debe08ce6adb0fd4d9fbdc7dc1a33f3150",
+      "size": 57971,
+      "normalized_sha256": "82dc2b359548ab4cfe3239a4e173a7debe08ce6adb0fd4d9fbdc7dc1a33f3150"
+    },
+    "docs/prd/PRD_基于无人机图像的大田农作物智能监测与管理系统_v4.md": {
+      "role": "index",
+      "sha256": "bfb1c22a78adbd6a1fb7d8bdc73f08cd98095aabd3d663de63586d5ede772e04",
+      "size": 69405,
+      "normalized_sha256": "bfb1c22a78adbd6a1fb7d8bdc73f08cd98095aabd3d663de63586d5ede772e04"
+    },
+    "docs/prd/PRD_基于无人机图像的大田农作物智能监测与管理系统_v5.md": {
+      "role": "index",
+      "sha256": "8812918111f9c5b5e9d9c8cc4484abaa6e03b843e469254cc1cea6dd3c272698",
+      "size": 73800,
+      "normalized_sha256": "f493dadaba0954c3c5fa24e58f220183ec712af3a00dda738d766f7ccf34fce4"
+    },
+    "docs/prd/PRD_基于无人机图像的大田农作物智能监测与管理系统_v6.md": {
+      "role": "index",
+      "sha256": "467036a1b5eb7f558be52d50818285c2c47a511b9072b98fd92ad37d749dd873",
+      "size": 104255,
+      "normalized_sha256": "da13328da0521bdfe8c9b93f5ee6086f88db3c14f3e277c6dffcf680336047df"
+    },
+    "docs/prd/PRD_基于无人机图像的大田农作物智能监测与管理系统_v7.md": {
+      "role": "index",
+      "sha256": "80230c7f2fad651063905a91ba25a81883768a4cac98eff0164582c15b1953b4",
+      "size": 54883,
+      "normalized_sha256": "80230c7f2fad651063905a91ba25a81883768a4cac98eff0164582c15b1953b4"
+    },
+    "docs/qna_record/作物检测与计数功能实现分析报告.md": {
+      "role": "index",
+      "sha256": "983bce60430e6d6ef6cd05d8daa0ffd12a9c0fee72e93b2e5bda0277ecd3f893",
+      "size": 18858,
+      "normalized_sha256": "983bce60430e6d6ef6cd05d8daa0ffd12a9c0fee72e93b2e5bda0277ecd3f893"
+    },
+    "docs/qna_record/作物计数实现对比与改进分析报告.md": {
+      "role": "index",
+      "sha256": "64ee55026d2e347a99bd7a69517fc4e2db2f581973eaa16b5af55ed22ca55c9d",
+      "size": 24999,
+      "normalized_sha256": "01e803590e636dbedfd7998a85bb7892a2d6cb127b335ce394e1d8b6b545ba19"
     },
     "docs/sdd/plans/2026-08-11-data-management-batch-registry-plan.md": {
       "role": "index",
@@ -1294,6 +1414,78 @@
       "sha256": "c5e616ef6a17d17e4ccf3c946fdec8642e170c528996d1a2cae4a61e9e50f2be",
       "size": 32517,
       "normalized_sha256": "c5e616ef6a17d17e4ccf3c946fdec8642e170c528996d1a2cae4a61e9e50f2be"
+    },
+    "docs/update_report/001_20260810_000000_算法管理模块优化FP16清理注册持久化文件上传图标统一.md": {
+      "role": "index",
+      "sha256": "eef25f0b71495eb0a57764a2034f223f61276546ab19469c42be48f0a03d1c07",
+      "size": 14238,
+      "normalized_sha256": "eef25f0b71495eb0a57764a2034f223f61276546ab19469c42be48f0a03d1c07"
+    },
+    "docs/update_report/002_20260810_213403_作物检测与计数模块新增图片查看交互功能.md": {
+      "role": "index",
+      "sha256": "c6c97fdf0eefa1cd8ed4e907aa7d047593a980e35b6c62829e135b9e8a207a06",
+      "size": 8106,
+      "normalized_sha256": "c6c97fdf0eefa1cd8ed4e907aa7d047593a980e35b6c62829e135b9e8a207a06"
+    },
+    "docs/update_report/003_20260811_011217_作物计数管线五项改进_批量推理与max_det告警.md": {
+      "role": "index",
+      "sha256": "19facae2a378e3dbe67ef2a9b5d14e52fe011b19715ff33545153c70a5ff137a",
+      "size": 14861,
+      "normalized_sha256": "75c2f4d7166935bd4bddd4bf7f558505204f7a9eddd9863ea626c1b1f07d8c46"
+    },
+    "docs/update_report/004_20260811_111549_作物计数参数默认值调整与前端UIUX质感升级.md": {
+      "role": "index",
+      "sha256": "6b7fc99f362eefc308b9e90eb55d7b804d514f61bd30e4f2dd63531ddbb4711b",
+      "size": 9469,
+      "normalized_sha256": "e0d865a1de0f7fb8dffb9dc0a9ec7960e2c02b62fe449f6d78d9645dce09f830"
+    },
+    "docs/update_report/005_20260811_233304_数据管理模块架次真实功能替代Mock.md": {
+      "role": "index",
+      "sha256": "ad5c432ce1a921eed5447dd7719d98fd4dccb8cdb8096a545bd4e94a0f128fbe",
+      "size": 12826,
+      "normalized_sha256": "ad5c432ce1a921eed5447dd7719d98fd4dccb8cdb8096a545bd4e94a0f128fbe"
+    },
+    "docs/update_report/006_20260812_000332_架次登记表单三项增强_命名格式作物自定义文件夹选择.md": {
+      "role": "index",
+      "sha256": "4901d558981b1832c8342d9bb2d012dcc4adc5b11e75481fb6614f46481173c5",
+      "size": 9871,
+      "normalized_sha256": "4901d558981b1832c8342d9bb2d012dcc4adc5b11e75481fb6614f46481173c5"
+    },
+    "docs/update_report/007_20260812_201049_数据处理模块真实实现CLAHE滑窗裁切任务持久化与加工数据双tab.md": {
+      "role": "index",
+      "sha256": "5a428394b11ee40fcd6fc04b1536a97b995ecbe0e32433b8ee734526d23841ea",
+      "size": 15505,
+      "normalized_sha256": "5a428394b11ee40fcd6fc04b1536a97b995ecbe0e32433b8ee734526d23841ea"
+    },
+    "docs/update_report/008_20260812_215453_导航折叠拖拽检测计数图片持久化数据处理输入源与差异化预览加工数据浏览增强.md": {
+      "role": "index",
+      "sha256": "c02d16f2bf576e40972625175c480065a696d8906f4d8eda024f3cb3ecd23900",
+      "size": 12022,
+      "normalized_sha256": "c02d16f2bf576e40972625175c480065a696d8906f4d8eda024f3cb3ecd23900"
+    },
+    "docs/update_report/009_20260813_012144_首页卡片高度对齐原始数据卡片化侧边栏吸附与处理任务顶部Tab.md": {
+      "role": "index",
+      "sha256": "67c80635a6f710388de2d94733161a0c2a4fcf4b612bcc3d1b62db68987e2387",
+      "size": 10711,
+      "normalized_sha256": "67c80635a6f710388de2d94733161a0c2a4fcf4b612bcc3d1b62db68987e2387"
+    },
+    "docs/update_report/010_20260813_182559_侧边栏折叠态图标布局优化水平居中与间距调整.md": {
+      "role": "index",
+      "sha256": "8a240132f10f1817be7361eb5a6bbc98922a319f68564711cc8a2e7fe18ee9ce",
+      "size": 7987,
+      "normalized_sha256": "8a240132f10f1817be7361eb5a6bbc98922a319f68564711cc8a2e7fe18ee9ce"
+    },
+    "docs/update_report/011_20260815_105956_数据集详情页删改布局重排统计口径调整样本浏览抽样与翻页优化.md": {
+      "role": "index",
+      "sha256": "b076434cc4f6424e6d3bd4b8d5f7bc2b135c798852d7b03c6c65517a40bf9a48",
+      "size": 14682,
+      "normalized_sha256": "b076434cc4f6424e6d3bd4b8d5f7bc2b135c798852d7b03c6c65517a40bf9a48"
+    },
+    "docs/update_report/012_20261119_231452_Win压缩包发布流程规划与exe产物分类.md": {
+      "role": "index",
+      "sha256": "cea5ffaec433f21d20c35b2fd6f7f63370efe61ccaa8d2b0ca381467bfa5b77f",
+      "size": 9778,
+      "normalized_sha256": "cea5ffaec433f21d20c35b2fd6f7f63370efe61ccaa8d2b0ca381467bfa5b77f"
     },
     "electron/.gitignore": {
       "role": "index",

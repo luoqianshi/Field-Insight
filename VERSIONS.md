@@ -2,7 +2,7 @@
 
 > 本文件是「田间智瞰」项目版本历史与发版计划的单一索引。
 > 2026-11-25 版本编号体系重构：旧桌面版本线 **v1.0.0 / v1.1.0 全部重置并入 V0.5.5 基线**；2026-11-24 的「无人机型号选择 + 地块地理位置」更新定为 **V0.5.6（当前基线）**。历史文档（`docs/desktop-build-guide.md`、`.lqs/` 报告等）保留旧编号原文，以本文映射表对照，不回改。
-> 历史细节来源：`.lqs/prd/`（PRD v1~v7）、`.lqs/update_report/`（001~012）、`.lqs/bug_report/`（001~011）、`LOG.md`、git 提交树（追溯重构，V0.5.5 及以前版本号为回填编号，非当时实际发布号）。
+> 历史细节来源：`docs/prd/`（PRD v1~v7）、`docs/update_report/`（001~012）、`docs/bug_report/`（001~011）、`LOG.md`、git 提交树（追溯重构，V0.5.5 及以前版本号为回填编号，非当时实际发布号）。
 
 ---
 
@@ -16,7 +16,7 @@
 | 版本透传链 | 桌面壳以 `TJZK_APP_VERSION` 环境变量传给冻结后端 → `backend/config.py` 的 `APP_VERSION`（开发态回退读 `electron/package.json`） |
 | Git tag | 注解 tag `vX.Y.Z`，与 `electron/package.json` 对齐；**截至 V0.5.6 仓库尚无任何 tag**（旧 v1.0.0/v1.1.0 未打过 tag、未发 GitHub Release），`v0.5.6` 将是新编号体系首个 tag |
 | 提交规范 | Conventional Commits（见 AGENTS.md） |
-| 记录分工 | `VERSIONS.md`＝版本级索引；`LOG.md`＝任务级一行日志；`.lqs/update_report/`、`.lqs/bug_report/`＝详细归档；`.lqs/prd/`＝需求基线 |
+| 记录分工 | `VERSIONS.md`＝版本级索引；`LOG.md`＝任务级一行日志；`docs/update_report/`、`docs/bug_report/`＝详细归档；`docs/prd/`＝需求基线 |
 | 桌面发布流程 | 冻结验证（pytest → frontend build → 载荷重建 → smoke）→ 版本提交 → 注解 tag → 走代理推送（AGENTS.md Git 工作流）→ 产物 + SHA256 → `gh release create` |
 
 ### 新旧编号映射

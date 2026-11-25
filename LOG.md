@@ -44,3 +44,4 @@
 - [2026-11-25 15:50] fix(desktop,data): 补齐 BatchDetail.vue 缺失的 DataSubTabs 导入；Electron 窗口最小尺寸由 1024×620 对齐规范 1100×760（小屏回退），前端已重新 build
 - [2026-11-25 17:05] docs(versions): 新建 VERSIONS.md 版本管理与发版计划——旧 v1.0.0/v1.1.0 重置并入 V0.5.5 基线，追溯重构 V0.1.0~V0.5.6 版本历史；electron/package.json 与 backend/config.py 版本号同步改为 0.5.6
 - [2026-11-25 17:22] docs(versions): 补全 VERSIONS.md 遗漏细节（V0.1.0 前端页面与 SPA 修复、V0.2.0 计数管线/字体图标、V0.4.0 项目更名与 Icon 统一、V0.5.2 品牌信息修正等），移除 PRD v7 智能助手相关版本规划
+- [2026-11-25 18:05] docs(repo): 文档目录规范化收口——bug/update 报告、PRD、问答记录统一迁入 docs/，同步更新 bug_report/update_report SKILL 输出目录、AGENTS/README/VERSIONS 路径引用与目录树
