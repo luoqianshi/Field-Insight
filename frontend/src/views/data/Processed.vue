@@ -2,6 +2,7 @@
 import AppLayout from '@/components/layout/AppLayout.vue'
 import DataSubTabs from '@/components/layout/DataSubTabs.vue'
 import Icon from '@/components/common/Icon.vue'
+import PathText from '@/components/common/PathText.vue'
 import { processingApi, type ProcessedItem } from '@/api/processing'
 import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
@@ -154,7 +155,7 @@ onMounted(load)
             <td class="py-3 px-5">
               <span class="badge" :class="statusBadge(item.status).cls">{{ statusBadge(item.status).label }}</span>
             </td>
-            <td class="py-3 px-5 text-ink-tertiary font-mono text-xs">{{ item.output_path }}</td>
+            <td class="py-3 px-5 text-ink-tertiary font-mono text-xs"><PathText :path="item.output_path" class="max-w-[260px]" /></td>
             <td class="text-right py-3 px-5 text-ink-primary">{{ item.image_count }}</td>
             <td class="py-3 px-5 text-ink-secondary text-xs">{{ item.created_at }}</td>
             <td class="py-3 px-5 text-right" @click.stop>

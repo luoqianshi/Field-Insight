@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppLayout from '@/components/layout/AppLayout.vue'
 import Icon from '@/components/common/Icon.vue'
+import PathText from '@/components/common/PathText.vue'
 import { useProcessingStore } from '@/stores/processing'
 import { ref, computed, onMounted } from 'vue'
 import type { ProcessingTask } from '@/api/processing'
@@ -180,8 +181,8 @@ onMounted(applyFilters)
                 <div class="text-xs text-ink-tertiary mt-0.5">{{ t.params?.clip_limit ? `clipLimit ${t.params.clip_limit}` : '' }}{{ t.params?.tile_size ? ` · tile ${t.params.tile_size}` : '' }}{{ t.params?.overlap_ratio ? ` · overlap ${t.params.overlap_ratio}` : '' }}</div>
               </td>
               <td class="py-2.5 px-5"><span class="tag" :class="typeTag(t.task_type)">{{ typeLabel(t.task_type) }}</span></td>
-              <td class="py-2.5 px-5 text-ink-secondary text-xs">{{ t.input_paths?.[0] || '-' }}</td>
-              <td class="py-2.5 px-5 text-ink-tertiary font-mono text-xs">{{ t.output_path }}</td>
+              <td class="py-2.5 px-5 text-ink-secondary text-xs"><PathText :path="t.input_paths?.[0]" class="max-w-[220px]" /></td>
+              <td class="py-2.5 px-5 text-ink-tertiary font-mono text-xs"><PathText :path="t.output_path" class="max-w-[240px]" /></td>
               <td class="py-2.5 px-5">
                 <div class="flex items-center gap-2">
                   <div class="progress w-24"><div class="progress-bar" :class="{ running: t.status === 'processing' && t.progress < 100 }" :style="{ width: t.progress + '%' }"></div></div>

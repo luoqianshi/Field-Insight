@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-11-25T05:23:44Z",
-  "updated_at": "2026-11-25T10:10:14Z",
+  "updated_at": "2026-11-25T13:56:48Z",
   "files": {
     ".gitattributes": {
       "role": "index",
@@ -839,9 +839,9 @@
     },
     "LOG.md": {
       "role": "index",
-      "sha256": "34fc0a2227e7eb5f8d8ab76acf83efe18288000d10daef2bdc5f8052fb7d41a7",
-      "size": 6083,
-      "normalized_sha256": "34fc0a2227e7eb5f8d8ab76acf83efe18288000d10daef2bdc5f8052fb7d41a7"
+      "sha256": "b43f06b9a69eb9ecb9d5898f1e40df10abdc130797bfb6ae5b474a0680c3dc9d",
+      "size": 6354,
+      "normalized_sha256": "284cfcc5697a60161b6f3c134ffef93ee1b393b7efa205af46d2ee2d029d4589"
     },
     "README.md": {
       "role": "index",
@@ -857,9 +857,9 @@
     },
     "aoci.code.txt": {
       "role": "index",
-      "sha256": "3f77149609db025cdf64dfd398ac6d89ee30b0373bce083b6bc969c71b624589",
-      "size": 90407,
-      "normalized_sha256": "3f77149609db025cdf64dfd398ac6d89ee30b0373bce083b6bc969c71b624589"
+      "sha256": "4e200344b0cbcbc081ef564e164224550e3ae168e3ff135baaa9e0ac8cd95993",
+      "size": 92170,
+      "normalized_sha256": "4e200344b0cbcbc081ef564e164224550e3ae168e3ff135baaa9e0ac8cd95993"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -927,9 +927,9 @@
     },
     "backend/api/processing_api.py": {
       "role": "index",
-      "sha256": "b252af91c0e0b89dee17b9315a1c58deb40ed78794f148b0d280f126f7e8d192",
-      "size": 12984,
-      "normalized_sha256": "e11750ba5fadbcff651c332175f78a33c09179141303699e40f363000aaf7eb5"
+      "sha256": "05f5b2278193f3090a9befbab7d406875ba78a1d567e14e1af8d58677d432985",
+      "size": 14076,
+      "normalized_sha256": "d2f6afa7e54ed1a07433449dce97aff1ffedaf19c2a73e28a3c5dfc706525637"
     },
     "backend/api/settings_api.py": {
       "role": "index",
@@ -1183,9 +1183,9 @@
     },
     "backend/tests/test_processing_api.py": {
       "role": "observe",
-      "sha256": "99d19d789d15ea508a0d34d74bffbf44797b89ac5a0468c872495b56165e1792",
-      "size": 3989,
-      "normalized_sha256": "99d19d789d15ea508a0d34d74bffbf44797b89ac5a0468c872495b56165e1792"
+      "sha256": "d032d848de17bf4168fd856f394c2fc5b9b09bcb2f08bb340c37ee47e546d1ad",
+      "size": 5088,
+      "normalized_sha256": "d032d848de17bf4168fd856f394c2fc5b9b09bcb2f08bb340c37ee47e546d1ad"
     },
     "backend/tests/test_processing_engine.py": {
       "role": "observe",
@@ -1195,9 +1195,9 @@
     },
     "backend/tests/test_processing_integration.py": {
       "role": "observe",
-      "sha256": "8c547f5dcd3cc518aab7d34baf98c97090c3578a275e6ea3142e28f3d813146d",
-      "size": 5898,
-      "normalized_sha256": "8c547f5dcd3cc518aab7d34baf98c97090c3578a275e6ea3142e28f3d813146d"
+      "sha256": "5a130a835cddb4d1931e327cf24ddda7db2d109911e023606f8be7e40d582a36",
+      "size": 6166,
+      "normalized_sha256": "5a130a835cddb4d1931e327cf24ddda7db2d109911e023606f8be7e40d582a36"
     },
     "backend/tests/test_processing_registry.py": {
       "role": "observe",
@@ -1360,6 +1360,12 @@
       "sha256": "80230c7f2fad651063905a91ba25a81883768a4cac98eff0164582c15b1953b4",
       "size": 54883,
       "normalized_sha256": "80230c7f2fad651063905a91ba25a81883768a4cac98eff0164582c15b1953b4"
+    },
+    "docs/qna_record/DJI_Mavic3M_EXIF扩展信息解析与农业巡检价值分析.md": {
+      "role": "index",
+      "sha256": "b5ba86046a670590e9c1843424a9c646c9e6ee72a492246813667bb0746524a1",
+      "size": 9733,
+      "normalized_sha256": "b5ba86046a670590e9c1843424a9c646c9e6ee72a492246813667bb0746524a1"
     },
     "docs/qna_record/作物检测与计数功能实现分析报告.md": {
       "role": "index",
@@ -2515,6 +2521,12 @@
       "size": 13803,
       "normalized_sha256": "434618bb6264a3b189ea7faa0bf015f9051cd453ad3786a68c693a9d86add11a"
     },
+    "frontend/src/components/common/PathText.vue": {
+      "role": "index",
+      "sha256": "7b528c7a68312d8a5414e89f1b1fe4475ce6ee3aecc1dfaa0beea4a4d54e97c7",
+      "size": 1085,
+      "normalized_sha256": "7b528c7a68312d8a5414e89f1b1fe4475ce6ee3aecc1dfaa0beea4a4d54e97c7"
+    },
     "frontend/src/components/data/GeoLocationEditor.vue": {
       "role": "index",
       "sha256": "91015948d059bf9877eef4fc46d4729056424a31b3fa6a17af002a6aeaffef3a",
@@ -2661,15 +2673,15 @@
     },
     "frontend/src/views/data/Processed.vue": {
       "role": "index",
-      "sha256": "7b27a92ee56f9cf24437b43391aee12461ec2958aca75e3a834b578cce77905e",
-      "size": 7606,
-      "normalized_sha256": "7b27a92ee56f9cf24437b43391aee12461ec2958aca75e3a834b578cce77905e"
+      "sha256": "329f478516b29777c022c246521e7628b8c66ab9b3e1c5b8150ec578535c46e9",
+      "size": 7699,
+      "normalized_sha256": "329f478516b29777c022c246521e7628b8c66ab9b3e1c5b8150ec578535c46e9"
     },
     "frontend/src/views/data/ProcessedDetail.vue": {
       "role": "index",
-      "sha256": "791a8f08f0f5eb21476ba38de8e2c857a0c11c9ae85c2dff8f29778e461243b7",
-      "size": 11519,
-      "normalized_sha256": "791a8f08f0f5eb21476ba38de8e2c857a0c11c9ae85c2dff8f29778e461243b7"
+      "sha256": "61468bc3e3e6f77a46885485d3d88a3b9f5cdbf57e2f9ffa4ca317402e88260f",
+      "size": 11581,
+      "normalized_sha256": "61468bc3e3e6f77a46885485d3d88a3b9f5cdbf57e2f9ffa4ca317402e88260f"
     },
     "frontend/src/views/dataset/DatasetDetail.vue": {
       "role": "index",
@@ -2697,21 +2709,21 @@
     },
     "frontend/src/views/process/TaskDetail.vue": {
       "role": "index",
-      "sha256": "0ae9a4232ee83428b455b0ee642c3cf8317b171d9611b61cc09066e3c1a4a096",
-      "size": 22231,
-      "normalized_sha256": "0ae9a4232ee83428b455b0ee642c3cf8317b171d9611b61cc09066e3c1a4a096"
+      "sha256": "0c7f23f71d5ff2b1b6cefe72f53ecd490e24adaa07b9612dec2e0ffd1bfca8b5",
+      "size": 21496,
+      "normalized_sha256": "0c7f23f71d5ff2b1b6cefe72f53ecd490e24adaa07b9612dec2e0ffd1bfca8b5"
     },
     "frontend/src/views/process/TaskNew.vue": {
       "role": "index",
-      "sha256": "57f7dc034f9eea3e39f4b8e07ee60ebfe19a23e284b003fc13c4a3acb30fe827",
-      "size": 29752,
-      "normalized_sha256": "57f7dc034f9eea3e39f4b8e07ee60ebfe19a23e284b003fc13c4a3acb30fe827"
+      "sha256": "210262e4f95743a1e9ecea5e51665817c40a5202d7051a535225fa01569865be",
+      "size": 26869,
+      "normalized_sha256": "210262e4f95743a1e9ecea5e51665817c40a5202d7051a535225fa01569865be"
     },
     "frontend/src/views/process/Tasks.vue": {
       "role": "index",
-      "sha256": "bc955392a2043d67695dbb83d5e265d6bfda39e672bd87c463564350356cdaf3",
-      "size": 9753,
-      "normalized_sha256": "bc955392a2043d67695dbb83d5e265d6bfda39e672bd87c463564350356cdaf3"
+      "sha256": "3666be0dfa60c15835e5267dcc214e352ea03720ff5b3404a0f2cdf05349afd1",
+      "size": 9876,
+      "normalized_sha256": "3666be0dfa60c15835e5267dcc214e352ea03720ff5b3404a0f2cdf05349afd1"
     },
     "frontend/src/views/settings/Settings.vue": {
       "role": "index",

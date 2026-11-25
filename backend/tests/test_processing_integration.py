@@ -41,10 +41,20 @@ def client(app):
     return app.test_client()
 
 
-def test_clahe_end_to_end(client, tmp_path):
+@pytest.fixture
+def data_root(tmp_path, monkeypatch):
+    """受管 data/ 根：输入源安全校验仅允许 data/output 根下目录。"""
+    import config
+    d = tmp_path / "data"
+    d.mkdir()
+    monkeypatch.setattr(config, "DATA_DIR", d)
+    return d
+
+
+def test_clahe_end_to_end(client, data_root):
     """提交 CLAHE 任务 → 等待完成 → 校验 output 目录与 index.json。"""
     fixtures = Path(__file__).parent / "fixtures" / "sample_images"
-    input_dir = tmp_path / "batch_e2e"
+    input_dir = data_root / "batch_e2e"
     input_dir.mkdir()
     shutil.copy(fixtures / "small_640.jpg", input_dir / "DJI_0001.jpg")
     shutil.copy(fixtures / "small_640.jpg", input_dir / "DJI_0002.jpg")
@@ -92,10 +102,10 @@ def test_clahe_end_to_end(client, tmp_path):
     assert r.mimetype == "image/jpeg"
 
 
-def test_crop_end_to_end(client, tmp_path):
+def test_crop_end_to_end(client, data_root):
     """提交裁切任务 → 校验子图命名规范。"""
     fixtures = Path(__file__).parent / "fixtures" / "sample_images"
-    input_dir = tmp_path / "crop_e2e"
+    input_dir = data_root / "crop_e2e"
     input_dir.mkdir()
     shutil.copy(fixtures / "medium_1280.jpg", input_dir / "DJI_0001.JPG")
 
@@ -130,10 +140,10 @@ def test_crop_end_to_end(client, tmp_path):
     assert cfg["total_tiles"] > 0
 
 
-def test_delete_processed_end_to_end(client, tmp_path):
+def test_delete_processed_end_to_end(client, data_root):
     """提交任务 → 完成 → 删除加工数据 → 确认目录已清理。"""
     fixtures = Path(__file__).parent / "fixtures" / "sample_images"
-    input_dir = tmp_path / "del_e2e"
+    input_dir = data_root / "del_e2e"
     input_dir.mkdir()
     shutil.copy(fixtures / "small_640.jpg", input_dir / "a.jpg")
 

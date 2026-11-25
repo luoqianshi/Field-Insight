@@ -40,10 +40,14 @@ def client(app):
 
 
 @pytest.fixture
-def input_dir(tmp_path):
-    """准备测试输入目录（含一张测试图）。"""
+def input_dir(tmp_path, monkeypatch):
+    """准备测试输入目录（含一张测试图），置于受管 data/ 根下以通过输入源校验。"""
+    import config
+    data_dir = tmp_path / "data"
+    data_dir.mkdir(exist_ok=True)
+    monkeypatch.setattr(config, "DATA_DIR", data_dir)
     fixtures = Path(__file__).parent / "fixtures" / "sample_images"
-    d = tmp_path / "test_batch"
+    d = data_dir / "test_batch"
     d.mkdir()
     shutil.copy(fixtures / "small_640.jpg", d / "DJI_0001.jpg")
     return d
@@ -95,6 +99,32 @@ def test_submit_clahe_missing_input(client):
     assert r.status_code == 400
     data = r.get_json()
     assert data["success"] is False
+
+
+def test_submit_rejects_custom_dir(client, tmp_path):
+    """安全校验：data/output 根之外的自定义目录返回 400。"""
+    outside = tmp_path / "custom_dir"
+    outside.mkdir()
+    r = client.post("/api/processing/clahe", json={
+        "name": "自定义目录",
+        "input_paths": [str(outside)],
+        "params": {"clip_limit": 2.0},
+    })
+    assert r.status_code == 400
+    assert r.get_json()["success"] is False
+
+
+def test_submit_accepts_processed_output(client, tmp_path):
+    """加工产物目录（output/ 根下）可作为再加工输入。"""
+    d = tmp_path / "output" / "clahe_20260101_000000_000"
+    d.mkdir(parents=True)
+    r = client.post("/api/processing/crop", json={
+        "name": "再加工",
+        "input_paths": [str(d)],
+        "params": {"tile_size": 640},
+    })
+    assert r.status_code == 200
+    assert r.get_json()["success"] is True
 
 
 def test_get_task_not_found(client):

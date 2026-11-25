@@ -4,6 +4,7 @@ import { processingApi, type ProcessingTask, type TaskFile } from '@/api/process
 import { useRoute } from 'vue-router'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import Icon from '@/components/common/Icon.vue'
+import PathText from '@/components/common/PathText.vue'
 import ImageViewer from '@/components/common/ImageViewer.vue'
 
 // 1:1 迁移 process/task-detail.html：任务参数 + 结果预览(网格/对比) + 执行日志
@@ -192,7 +193,10 @@ onUnmounted(stopPolling)
             <span class="badge" :class="statusBadge(task.status).cls">{{ statusBadge(task.status).label }}</span>
             <span class="tag" :class="typeTag(task.task_type)">{{ typeLabel(task.task_type) }}</span>
           </div>
-          <p class="text-sm text-ink-secondary mt-1">{{ inputLabel }} · 开始于 {{ task.created_at }}{{ task.completed_at ? ' · 完成于 ' + task.completed_at : '' }}</p>
+          <p class="text-sm text-ink-secondary mt-1 flex items-center gap-1.5 flex-wrap">
+            <PathText :path="inputLabel" class="max-w-[420px]" />
+            <span>· 开始于 {{ task.created_at }}{{ task.completed_at ? ' · 完成于 ' + task.completed_at : '' }}</span>
+          </p>
         </div>
         <router-link to="/process/tasks" class="px-3 py-2 bg-white border border-surface-border hover:bg-surface-hover rounded-btn text-sm text-ink-primary inline-flex items-center gap-2">
           <Icon name="arrow-left" :size="14" /> 返回列表
@@ -218,17 +222,14 @@ onUnmounted(stopPolling)
       </div>
 
       <!-- 统计卡片 -->
-      <div class="grid grid-cols-5 gap-4 mb-5">
+      <div class="grid gap-4 mb-5" :class="isCrop ? 'grid-cols-5' : 'grid-cols-4'">
         <div class="bg-white border border-surface-border rounded-card p-4"><div class="text-xs text-ink-tertiary">总图像</div><div class="text-2xl font-semibold text-ink-primary mt-1">{{ task.total_images }}</div></div>
         <div class="bg-white border border-surface-border rounded-card p-4"><div class="text-xs text-ink-tertiary">已处理</div><div class="text-2xl font-semibold text-brand-700 mt-1">{{ task.processed_images }}</div></div>
         <div class="bg-white border border-surface-border rounded-card p-4"><div class="text-xs text-ink-tertiary">失败</div><div class="text-2xl font-semibold text-ink-primary mt-1">{{ Math.max(0, (task.total_images || 0) - (task.processed_images || 0)) }}</div></div>
         <div class="bg-white border border-surface-border rounded-card p-4"><div class="text-xs text-ink-tertiary">成功率</div><div class="text-2xl font-semibold text-brand-700 mt-1">{{ successRate }}%</div></div>
-        <div class="bg-white border border-surface-border rounded-card p-4">
-          <div class="text-xs text-ink-tertiary">{{ isCrop ? '子图总数' : '平均速度' }}</div>
-          <div class="text-2xl font-semibold text-ink-primary mt-1">
-            <template v-if="isCrop">{{ task.total_tiles ?? 0 }}<span class="text-sm text-ink-tertiary ml-1">tiles</span></template>
-            <template v-else>0.65<span class="text-sm text-ink-tertiary ml-1">s/张</span></template>
-          </div>
+        <div v-if="isCrop" class="bg-white border border-surface-border rounded-card p-4">
+          <div class="text-xs text-ink-tertiary">子图总数</div>
+          <div class="text-2xl font-semibold text-ink-primary mt-1">{{ task.total_tiles ?? 0 }}<span class="text-sm text-ink-tertiary ml-1">tiles</span></div>
         </div>
       </div>
 
@@ -238,10 +239,10 @@ onUnmounted(stopPolling)
           <div class="bg-white border border-surface-border rounded-card p-5">
             <h3 class="text-sm font-semibold text-ink-primary mb-3">任务参数</h3>
             <div class="grid grid-cols-4 gap-4 pt-4 border-t border-surface-border">
-              <div><div class="text-xs text-ink-tertiary mb-1">输入源</div><div class="text-sm font-medium text-ink-primary">{{ inputLabel }}</div></div>
-              <div><div class="text-xs text-ink-tertiary mb-1">{{ isClahe ? '阈值 (clipLimit)' : '切片尺寸' }}</div><div class="text-sm font-medium text-ink-primary">{{ isClahe ? (task.params?.clip_limit ?? '2.0') : (task.params?.tile_size ?? '640') }}</div></div>
-              <div><div class="text-xs text-ink-tertiary mb-1">{{ isClahe ? '网格数量' : '重叠率' }}</div><div class="text-sm font-medium text-ink-primary">{{ isClahe ? gridLabel : (task.params?.overlap_ratio ?? '0.05') }}</div></div>
-              <div><div class="text-xs text-ink-tertiary mb-1">输出目录</div><div class="text-sm font-mono text-ink-primary truncate">{{ task.output_path }}</div></div>
+              <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">输入源</div><PathText :path="inputLabel" class="text-sm font-medium text-ink-primary" /></div>
+              <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">{{ isClahe ? '阈值 (clipLimit)' : '切片尺寸' }}</div><div class="text-sm font-medium text-ink-primary">{{ isClahe ? (task.params?.clip_limit ?? '2.0') : (task.params?.tile_size ?? '640') }}</div></div>
+              <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">{{ isClahe ? '网格数量' : '重叠率' }}</div><div class="text-sm font-medium text-ink-primary">{{ isClahe ? gridLabel : (task.params?.overlap_ratio ?? '0.05') }}</div></div>
+              <div class="min-w-0"><div class="text-xs text-ink-tertiary mb-1">输出目录</div><PathText :path="task.output_path" class="text-sm font-mono text-ink-primary" /></div>
             </div>
           </div>
 
@@ -293,7 +294,7 @@ onUnmounted(stopPolling)
                 </div>
               </div>
               <div class="mt-3 flex items-center text-xs text-ink-tertiary">
-                <Icon name="info" :size="12" class="mr-1.5" /> 同一文件名左为原图、右为增强后；输出目录为 <code class="px-1 py-0.5 bg-surface-hover rounded">{{ task.output_path }}</code>
+                <Icon name="info" :size="12" class="mr-1.5" /> 同一文件名左为原图、右为增强后；输出目录为 <PathText :path="task.output_path" class="px-1 py-0.5 bg-surface-hover rounded font-mono max-w-[320px]" />
               </div>
             </div>
 
@@ -350,7 +351,7 @@ onUnmounted(stopPolling)
           <!-- 执行日志 -->
           <div class="bg-white border border-surface-border rounded-card p-5">
             <h3 class="text-sm font-semibold text-ink-primary mb-3">执行日志</h3>
-            <div class="font-mono text-xs bg-surface-bg rounded-btn p-3 leading-6 text-ink-secondary">
+            <div class="font-mono text-xs bg-surface-bg rounded-btn p-3 leading-6 text-ink-secondary break-all">
               <div><span class="text-ink-tertiary">[{{ task.created_at }}]</span> 任务启动 · TASK_ID={{ task.task_id }}</div>
               <div><span class="text-ink-tertiary">[{{ task.created_at }}]</span> 加载输入：{{ inputLabel }} ({{ task.total_images }} 张)</div>
               <div><span class="text-ink-tertiary">[运行]</span> 参数：{{ isClahe ? `clipLimit=${task.params?.clip_limit ?? 2.0}` : `tile=${task.params?.tile_size ?? 640}, overlap=${task.params?.overlap_ratio ?? 0.05}` }}</div>
@@ -368,20 +369,10 @@ onUnmounted(stopPolling)
             <div class="space-y-2.5 text-xs">
               <div class="flex justify-between"><span class="text-ink-tertiary">任务 ID</span><span class="font-mono text-ink-primary">{{ task.task_id }}</span></div>
               <div class="flex justify-between"><span class="text-ink-tertiary">类型</span><span class="text-ink-primary">{{ typeLabel(task.task_type) }}</span></div>
-              <div class="flex justify-between"><span class="text-ink-tertiary">创建者</span><span class="text-ink-primary">李研究员</span></div>
               <div class="flex justify-between"><span class="text-ink-tertiary">开始时间</span><span class="text-ink-primary">{{ task.started_at || task.created_at }}</span></div>
               <div class="flex justify-between"><span class="text-ink-tertiary">结束时间</span><span class="text-ink-primary">{{ task.completed_at || '—' }}</span></div>
-              <div class="flex justify-between gap-2"><span class="text-ink-tertiary flex-shrink-0">输入路径</span><span class="font-mono text-ink-primary text-[11px] text-right break-all">{{ inputLabel }}</span></div>
-              <div class="flex justify-between"><span class="text-ink-tertiary">设备</span><span class="text-ink-primary">CPU · 8 workers</span></div>
+              <div class="flex justify-between gap-2"><span class="text-ink-tertiary flex-shrink-0">输入路径</span><PathText :path="inputLabel" class="font-mono text-ink-primary text-[11px] text-right" /></div>
             </div>
-          </div>
-          <!-- 下游数据集 -->
-          <div class="bg-white border border-surface-border rounded-card p-5">
-            <h3 class="text-sm font-semibold text-ink-primary mb-3">下游数据集</h3>
-            <router-link to="/dataset/datasets" class="block p-3 border border-surface-border rounded-btn hover:border-brand-300">
-              <div class="text-sm font-medium text-ink-primary">甘蔗幼苗 v1.2.0</div>
-              <div class="text-xs text-ink-tertiary mt-1">v1.2.0 · 已发布</div>
-            </router-link>
           </div>
         </div>
       </div>

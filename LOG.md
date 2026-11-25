@@ -46,3 +46,4 @@
 - [2026-11-25 17:22] docs(versions): 补全 VERSIONS.md 遗漏细节（V0.1.0 前端页面与 SPA 修复、V0.2.0 计数管线/字体图标、V0.4.0 项目更名与 Icon 统一、V0.5.2 品牌信息修正等），移除 PRD v7 智能助手相关版本规划
 - [2026-11-25 18:05] docs(repo): 文档目录规范化收口——bug/update 报告、PRD、问答记录统一迁入 docs/，同步更新 bug_report/update_report SKILL 输出目录、AGENTS/README/VERSIONS 路径引用与目录树
 - [2026-11-25 21:05] docs(qna): 新增 DJI Mavic 3M 图像 EXIF 扩展信息解析与农业巡检价值分析（docs/qna_record/）
+- [2026-11-25 21:53] fix(process): 移除自定义目录输入源并加后端校验，删详情静态冗余字段，长路径缩略显示

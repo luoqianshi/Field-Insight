@@ -33,6 +33,26 @@ def _resolve_path(path_str):
     return p
 
 
+def _validate_input_paths(input_paths):
+    """输入源安全校验：仅允许已上传架次数据根（data/）或加工产物根（output/）下的目录。
+
+    拒绝任意自定义目录与路径穿越；返回错误信息，None 表示通过。
+    """
+    roots = [Path(config.DATA_DIR).resolve(), Path(config.OUTPUT_DIR).resolve()]
+    for raw in input_paths:
+        if not isinstance(raw, str) or not raw.strip():
+            return "输入源路径非法"
+        p = Path(raw.strip())
+        if not p.is_absolute():
+            p = Path(config.PROJECT_ROOT) / p
+        rp = p.resolve()
+        if not any(rp == root or root in rp.parents for root in roots):
+            return f"输入源仅支持已上传架次或加工产物目录，不允许自定义目录: {raw}"
+        if not rp.is_dir():
+            return f"输入源目录不存在: {raw}"
+    return None
+
+
 # ── 任务提交 ──────────────────────────────────────────────────
 @processing_bp.route("/api/processing/clahe", methods=["POST"])
 def submit_clahe():
@@ -48,7 +68,10 @@ def submit_clahe():
     input_paths = body.get("input_paths") or []
     params = body.get("params") or {}
     if not input_paths:
-        return _error("必须指定 input_paths（至少一个架次或目录）")
+        return _error("必须指定 input_paths（至少一个架次或加工产物）")
+    err = _validate_input_paths(input_paths)
+    if err:
+        return _error(err)
 
     try:
         cfg = registry.create_task(
@@ -77,7 +100,10 @@ def submit_crop():
     input_paths = body.get("input_paths") or []
     params = body.get("params") or {}
     if not input_paths:
-        return _error("必须指定 input_paths（至少一个架次或目录）")
+        return _error("必须指定 input_paths（至少一个架次或加工产物）")
+    err = _validate_input_paths(input_paths)
+    if err:
+        return _error(err)
 
     try:
         cfg = registry.create_task(

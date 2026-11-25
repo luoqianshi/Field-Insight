@@ -5,6 +5,7 @@ import { processingApi, type ProcessedItem } from '@/api/processing'
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import Icon from '@/components/common/Icon.vue'
+import PathText from '@/components/common/PathText.vue'
 
 const router = useRouter()
 
@@ -22,8 +23,7 @@ const currentStep = ref(1)
 
 const selectedType = ref<'clahe' | 'crop' | ''>('clahe')
 const selectedBatchIds = ref<string[]>([])
-const inputMode = ref<'batch' | 'data' | 'dir'>('batch')
-const customDir = ref('')
+const inputMode = ref<'batch' | 'data'>('batch')
 const selectedProcessedIds = ref<string[]>([])
 
 function generateDefaultName(type: 'clahe' | 'crop'): string {
@@ -94,8 +94,7 @@ function canNext(): boolean {
   if (currentStep.value === 1) return !!selectedType.value
   if (currentStep.value === 2) {
     if (inputMode.value === 'batch') return selectedBatchIds.value.length > 0
-    if (inputMode.value === 'data') return selectedProcessedIds.value.length > 0
-    return !!customDir.value.trim()
+    return selectedProcessedIds.value.length > 0
   }
   if (currentStep.value === 3) return !!form.value.name
   return true
@@ -110,25 +109,6 @@ function prev() {
 }
 
 // 路径选择（弹窗）
-async function pickCustomDir() {
-  picking.value = true
-  errorMsg.value = ''
-  try {
-    const res = await batchesApi.pickFolder()
-    if (res.data?.cancelled) return
-    const picked = res.data?.path
-    if (!picked) {
-      errorMsg.value = '未获取到所选路径'
-      return
-    }
-    customDir.value = picked
-  } catch (e: any) {
-    errorMsg.value = e.message || '打开文件夹对话框失败'
-  } finally {
-    picking.value = false
-  }
-}
-
 async function pickOutputPath() {
   picking.value = true
   errorMsg.value = ''
@@ -154,14 +134,10 @@ async function submit() {
   successMsg.value = ''
   errorMsg.value = ''
   try {
-    let input_paths: string[]
-    if (inputMode.value === 'batch') {
-      input_paths = selectedBatches.value.map((b) => b.image_folder_path)
-    } else if (inputMode.value === 'data') {
-      input_paths = selectedProcessedItems.value.map((p) => p.output_path)
-    } else {
-      input_paths = [customDir.value]
-    }
+    const input_paths =
+      inputMode.value === 'batch'
+        ? selectedBatches.value.map((b) => b.image_folder_path)
+        : selectedProcessedItems.value.map((p) => p.output_path)
     let taskId: string
     if (selectedType.value === 'clahe') {
       const res = await processingApi.submitClahe({
@@ -286,7 +262,7 @@ onMounted(async () => {
           <div class="space-y-4">
             <div>
               <label class="block text-xs font-medium text-ink-primary mb-2">输入源类型</label>
-              <div class="grid grid-cols-3 gap-3">
+              <div class="grid grid-cols-2 gap-3">
                 <div class="select-card !p-3.5" :class="{ selected: inputMode === 'batch' }" @click="inputMode = 'batch'">
                   <div class="flex items-start gap-2">
                     <Icon name="dataset" :size="18" class="text-brand-700 mt-0.5 flex-shrink-0" />
@@ -302,15 +278,6 @@ onMounted(async () => {
                     <div class="min-w-0">
                       <div class="text-sm font-medium text-ink-primary">数据选择</div>
                       <div class="text-xs text-ink-tertiary mt-0.5">从加工产物 (output/) 中再加工</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="select-card !p-3.5" :class="{ selected: inputMode === 'dir' }" @click="inputMode = 'dir'">
-                  <div class="flex items-start gap-2">
-                    <Icon name="folder-open" :size="18" class="text-blue-600 mt-0.5 flex-shrink-0" />
-                    <div class="min-w-0">
-                      <div class="text-sm font-medium text-ink-primary">自定义目录路径</div>
-                      <div class="text-xs text-ink-tertiary mt-0.5">弹窗选择或手动输入任意目录</div>
                     </div>
                   </div>
                 </div>
@@ -368,7 +335,7 @@ onMounted(async () => {
               </p>
             </div>
 
-            <div v-else-if="inputMode === 'data'">
+            <div v-else>
               <label class="block text-xs font-medium text-ink-primary mb-1.5">选择加工产物 <span class="text-red-500">*</span></label>
               <div class="border border-surface-border rounded-btn overflow-hidden">
                 <table class="w-full text-sm">
@@ -405,7 +372,7 @@ onMounted(async () => {
                         <span class="tag" :class="typeBadge(p.task_type)">{{ typeLabel(p.task_type) }}</span>
                       </td>
                       <td class="text-right py-2 px-3 text-ink-secondary text-xs">{{ p.image_count }}</td>
-                      <td class="py-2 px-3 text-ink-tertiary font-mono text-[11px]">{{ p.output_path }}</td>
+                      <td class="py-2 px-3 text-ink-tertiary font-mono text-[11px]"><PathText :path="p.output_path" class="max-w-[220px]" /></td>
                       <td class="text-right py-2 px-3 text-ink-secondary text-xs">{{ p.created_at }}</td>
                     </tr>
                   </tbody>
@@ -416,28 +383,6 @@ onMounted(async () => {
               </p>
             </div>
 
-            <div v-else>
-              <label class="block text-xs font-medium text-ink-primary mb-1.5">目录路径 <span class="text-red-500">*</span></label>
-              <div class="flex gap-2">
-                <div class="flex-1 relative">
-                  <Icon name="folder-open" :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-ink-tertiary" />
-                  <input
-                    v-model="customDir"
-                    type="text"
-                    placeholder="点击右侧「选择」按钮弹出系统文件夹选择对话框"
-                    class="w-full pl-9 pr-3 py-2 bg-white border border-surface-border rounded-btn text-sm font-mono focus:outline-none focus:border-brand-300"
-                  />
-                </div>
-                <button
-                  @click="pickCustomDir"
-                  :disabled="picking"
-                  class="px-4 py-2 bg-white border border-surface-border hover:bg-surface-hover text-brand-700 rounded-btn text-sm font-medium inline-flex items-center gap-1.5 disabled:opacity-50"
-                >
-                  <Icon name="folder-open" :size="14" /> {{ picking ? '选择中…' : '选择' }}
-                </button>
-              </div>
-              <p class="text-xs text-ink-tertiary mt-1.5">单击「选择」会弹出系统文件夹选择窗口；也可直接键入路径</p>
-            </div>
           </div>
         </div>
 
@@ -541,11 +486,8 @@ onMounted(async () => {
                 <template v-if="inputMode === 'batch'">
                   {{ selectedBatchIds.length }} 架次 · {{ selectedImageCount }} 张
                 </template>
-                <template v-else-if="inputMode === 'data'">
-                  {{ selectedProcessedIds.length }} 个加工产物 · {{ selectedProcessedImageCount }} 张
-                </template>
                 <template v-else>
-                  <span class="font-mono">{{ customDir }}</span>
+                  {{ selectedProcessedIds.length }} 个加工产物 · {{ selectedProcessedImageCount }} 张
                 </template>
               </span>
             </div>
@@ -553,7 +495,7 @@ onMounted(async () => {
             <div v-else class="flex justify-between"><span class="text-ink-tertiary">tile / overlap</span><span class="text-ink-primary">{{ form.tile_size }} / {{ form.overlap_ratio }}</span></div>
             <div class="flex justify-between gap-2">
               <span class="text-ink-tertiary flex-shrink-0">输出目录</span>
-              <span class="text-ink-primary font-mono text-xs text-right break-all">{{ form.output_path }}</span>
+              <PathText :path="form.output_path" class="text-ink-primary font-mono text-xs text-right" />
             </div>
           </div>
         </div>
@@ -570,13 +512,12 @@ onMounted(async () => {
               <span class="text-ink-tertiary flex-shrink-0">输入源</span>
               <span class="text-ink-primary text-right text-xs">
                 <template v-if="inputMode === 'batch'">{{ selectedBatchIds.length }} 架次 · {{ selectedImageCount }} 张</template>
-                <template v-else-if="inputMode === 'data'">{{ selectedProcessedIds.length }} 数据 · {{ selectedProcessedImageCount }} 张</template>
-                <template v-else>自定义目录</template>
+                <template v-else>{{ selectedProcessedIds.length }} 数据 · {{ selectedProcessedImageCount }} 张</template>
               </span>
             </div>
             <div v-if="selectedType === 'clahe'" class="flex justify-between"><span class="text-ink-tertiary">clipLimit</span><span class="text-ink-primary">{{ form.clip_limit }}</span></div>
             <div v-if="selectedType === 'crop'" class="flex justify-between"><span class="text-ink-tertiary">tile / overlap</span><span class="text-ink-primary">{{ form.tile_size }} / {{ form.overlap_ratio }}</span></div>
-            <div class="flex justify-between gap-2"><span class="text-ink-tertiary flex-shrink-0">输出目录</span><span class="text-ink-primary font-mono text-[11px] text-right break-all">{{ form.output_path }}</span></div>
+            <div class="flex justify-between gap-2"><span class="text-ink-tertiary flex-shrink-0">输出目录</span><PathText :path="form.output_path" class="text-ink-primary font-mono text-[11px] text-right" /></div>
           </div>
           <div class="divider my-4"></div>
           <div class="flex gap-2">

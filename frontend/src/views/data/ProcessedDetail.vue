@@ -2,6 +2,7 @@
 import AppLayout from '@/components/layout/AppLayout.vue'
 import DataSubTabs from '@/components/layout/DataSubTabs.vue'
 import Icon from '@/components/common/Icon.vue'
+import PathText from '@/components/common/PathText.vue'
 import ImageViewer from '@/components/common/ImageViewer.vue'
 import { processingApi, type ProcessedItem, type TaskFile } from '@/api/processing'
 import { useRoute, useRouter } from 'vue-router'
@@ -164,7 +165,7 @@ onMounted(load)
           <p class="text-xs text-ink-tertiary mt-1.5 flex items-center gap-1.5 font-mono">
             <Icon name="folder-open" :size="12" class="flex-shrink-0" />
             <span>输出路径：</span>
-            <span class="text-ink-secondary break-all">{{ item.output_path }}</span>
+            <PathText :path="item.output_path" class="text-ink-secondary max-w-[480px]" />
           </p>
         </div>
         <div class="flex gap-2">
