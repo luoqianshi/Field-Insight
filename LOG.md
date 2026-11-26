@@ -50,3 +50,4 @@
 - [2026-11-25 23:50] build(desktop): 版本升至 0.5.7 并产出 Electron 便携目录与 NSIS 安装包（CPU torch 载荷重建/冒烟与静默安装卸载验证，VERSIONS.md 同步）
 - [2026-11-26 00:47] feat(settings,process): 任务详情参数/信息卡底部与预览右边界对齐并移除执行日志；设置页双栏底部齐平，存储路径双击复制与打开本地目录（新增 /api/settings/open-folder）
 - [2026-11-26 01:10] build(desktop): 版本升至 0.5.8 并产出 Electron 便携目录与 NSIS 安装包（载荷 851.5MB/3382 文件、win-unpacked 1119.4MB、setup 365.1MiB，冒烟与静默安装卸载验证通过，VERSIONS.md 同步）
+- [2026-11-27 00:57] fix(settings): 打开目录后资源管理器窗口置顶激活（ctypes 识别新窗口+SetForegroundWindow/ALT 解锁+HWND_TOP），冻结载荷实测新窗口到前台；重建 V0.5.8 便携目录与安装包（新 SHA256 C9881154…22C5E），测试 185 passed

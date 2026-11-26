@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-11-25T05:23:44Z",
-  "updated_at": "2026-11-25T17:13:25Z",
+  "updated_at": "2026-11-26T16:58:42Z",
   "files": {
     ".gitattributes": {
       "role": "index",
@@ -839,9 +839,9 @@
     },
     "LOG.md": {
       "role": "index",
-      "sha256": "a21c30c72318b7bdefb382533765c9ad34fee0fde3c9951da321fa4eafbc0a4c",
-      "size": 7028,
-      "normalized_sha256": "59beb9762673e23eafaf277971366eafe84a3fbfdd2a359a6cb35bff6e824c79"
+      "sha256": "fdafec0e585521a6ccf9a05bc1f68ffb55005b03a63bc08cfb4db1e5e5f4c340",
+      "size": 7315,
+      "normalized_sha256": "c13cf5b4dd6ec5735538368be364ab1d12f57c32578f6fe58399eb0b33027640"
     },
     "README.md": {
       "role": "index",
@@ -851,15 +851,15 @@
     },
     "VERSIONS.md": {
       "role": "index",
-      "sha256": "f6749d5059e9639bbf979ad6b2d39cba0d1b64468341e4d56976dc16fff8f370",
-      "size": 22735,
-      "normalized_sha256": "f6749d5059e9639bbf979ad6b2d39cba0d1b64468341e4d56976dc16fff8f370"
+      "sha256": "ac078c799bc55bcc75b0fcc19bab381babafb46867629c5f92f7d9de318f663d",
+      "size": 23785,
+      "normalized_sha256": "ac078c799bc55bcc75b0fcc19bab381babafb46867629c5f92f7d9de318f663d"
     },
     "aoci.code.txt": {
       "role": "index",
-      "sha256": "7d7548873275c90615866fe4619abb799204d267383a0896c41ddbf59e2f6cbb",
-      "size": 92511,
-      "normalized_sha256": "7d7548873275c90615866fe4619abb799204d267383a0896c41ddbf59e2f6cbb"
+      "sha256": "2c7d657b73ad45f0c6b2138a1e50e2180751d5b7b7b9858861ede75d31363fa3",
+      "size": 92640,
+      "normalized_sha256": "2c7d657b73ad45f0c6b2138a1e50e2180751d5b7b7b9858861ede75d31363fa3"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -933,9 +933,9 @@
     },
     "backend/api/settings_api.py": {
       "role": "index",
-      "sha256": "0aaefe37937473bc36372e9442af7fd803635d05bdd25ccf42aadbde09bcc569",
-      "size": 9432,
-      "normalized_sha256": "0aaefe37937473bc36372e9442af7fd803635d05bdd25ccf42aadbde09bcc569"
+      "sha256": "530ed40d0c31e0f92844df25d29cf6e1a24a5baa5123e3c4f5a38625e24e7077",
+      "size": 12626,
+      "normalized_sha256": "530ed40d0c31e0f92844df25d29cf6e1a24a5baa5123e3c4f5a38625e24e7077"
     },
     "backend/app.py": {
       "role": "index",
@@ -1213,9 +1213,9 @@
     },
     "backend/tests/test_settings_api.py": {
       "role": "observe",
-      "sha256": "2fecd38eae0cf1162e865e891bc67c4f82df1dbf0e6ef0fc124f77fa242b4b29",
-      "size": 7524,
-      "normalized_sha256": "2fecd38eae0cf1162e865e891bc67c4f82df1dbf0e6ef0fc124f77fa242b4b29"
+      "sha256": "723471c9c98693334d5fee1920838433a2840826aa6636ceeb4ec006b70485dc",
+      "size": 11106,
+      "normalized_sha256": "723471c9c98693334d5fee1920838433a2840826aa6636ceeb4ec006b70485dc"
     },
     "backend/tests/test_storage_migration.py": {
       "role": "observe",

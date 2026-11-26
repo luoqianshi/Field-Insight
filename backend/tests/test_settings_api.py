@@ -165,6 +165,86 @@ def test_open_folder_opens_managed_dir(client, iso, monkeypatch):
     assert body["success"] is True
 
 
+def test_open_in_file_manager_focuses_new_explorer_window(monkeypatch):
+    """Windows：打开目录后应把新资源管理器窗口置顶，而不是丢在应用窗口底层。"""
+    calls = {"startfile": [], "raise": []}
+    seq = iter([{100, 200}, {100, 200, 250}])  # 打开前后两次枚举：出现新句柄 250
+    monkeypatch.setattr("api.settings_api._explorer_handles", lambda: next(seq))
+    monkeypatch.setattr("api.settings_api.os.startfile",
+                        lambda p: calls["startfile"].append(p))
+    monkeypatch.setattr("api.settings_api._raise_new_explorer_window",
+                        lambda before, timeout_s=2.0: calls["raise"].append(before))
+    monkeypatch.setattr("api.settings_api.sys.platform", "win32")
+
+    from api.settings_api import _open_in_file_manager
+    from pathlib import Path
+    target = Path("D:/data")
+    _open_in_file_manager(target)
+    assert calls["startfile"] == [str(target)]
+    # 置顶基准应是打开前的句柄集合 {100, 200}，从而识别出新窗口 250
+    assert calls["raise"] == [{100, 200}]
+
+
+def test_raise_new_explorer_window_picks_new_handle(monkeypatch):
+    from api.settings_api import _raise_new_explorer_window
+    raised = []
+    monkeypatch.setattr("api.settings_api._explorer_handles", lambda: {100, 250, 300})
+    monkeypatch.setattr("api.settings_api._raise_explorer_window",
+                        lambda hwnd: raised.append(hwnd))
+    _raise_new_explorer_window({100, 250}, timeout_s=1.0)
+    assert raised == [300]  # 只置顶新出现的句柄
+
+
+def test_raise_new_explorer_window_timeout_is_silent(monkeypatch):
+    """找不到新窗口（如复用已有窗口）时静默返回，不影响打开行为。"""
+    from api.settings_api import _raise_new_explorer_window
+    monkeypatch.setattr("api.settings_api._explorer_handles", lambda: {100})
+    monkeypatch.setattr("api.settings_api._raise_explorer_window",
+                        lambda hwnd: pytest.fail("不应置顶已有窗口"))
+    _raise_new_explorer_window({100}, timeout_s=0.2)
+
+
+def test_raise_explorer_window_alt_fallback():
+    """SetForegroundWindow 被前台锁拒绝时，用 ALT 模拟按键解锁后重试。"""
+    from api import settings_api
+
+    class FakeUser32:
+        def __init__(self):
+            self.calls = []
+            self.foreground_tried = 0
+
+        def ShowWindow(self, hwnd, cmd):
+            self.calls.append(("show", hwnd, cmd))
+
+        def SetForegroundWindow(self, hwnd):
+            self.foreground_tried += 1
+            self.calls.append(("fg", hwnd, self.foreground_tried))
+            return 0 if self.foreground_tried == 1 else 1  # 首次失败，重试成功
+
+        def keybd_event(self, vk, scan, flags, extra):
+            self.calls.append(("key", vk, flags))
+
+        def SetWindowPos(self, hwnd, after, x, y, cx, cy, flags):
+            self.calls.append(("pos", hwnd, flags))
+
+    fake = FakeUser32()
+    orig = settings_api._user32
+    settings_api._user32 = lambda: fake
+    try:
+        settings_api._raise_explorer_window(250)
+    finally:
+        settings_api._user32 = orig
+
+    kinds = [c[0] for c in fake.calls]
+    assert kinds == ["show", "fg", "key", "fg", "key", "pos"]
+    # ALT 按下（flags=0）→ 重试 → ALT 释放（flags=2）
+    assert fake.calls[2] == ("key", settings_api._VK_MENU, 0)
+    assert fake.calls[4] == ("key", settings_api._VK_MENU, 2)
+    assert fake.calls[-1][2] == (settings_api._SWP_NOMOVE
+                                 | settings_api._SWP_NOSIZE
+                                 | settings_api._SWP_SHOWWINDOW)
+
+
 def test_about(client, iso):
     body = client.get("/api/settings/about").get_json()
     assert body["success"] is True

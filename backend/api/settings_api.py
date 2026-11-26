@@ -6,6 +6,7 @@
 import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 from flask import Blueprint, jsonify, request
@@ -177,10 +178,88 @@ def pick_folder():
 
 
 # ── 打开本地目录（Web/桌面通用：后端与用户同机）────────────────
+# Windows 下 explorer 新窗口受前台锁限制，会被拥有焦点的应用（桌面壳）
+# 压在底层；打开后把新窗口拉到最上层，避免用户找不到。
+_EXPLORER_CLASSES = ("CabinetWClass", "ExploreWClass")
+_SW_RESTORE = 9
+_SWP_NOSIZE = 0x0001
+_SWP_NOMOVE = 0x0002
+_SWP_SHOWWINDOW = 0x0040
+_VK_MENU = 0x12  # ALT 键：模拟按键事件解锁 SetForegroundWindow 前台权限
+
+
+def _user32():
+    import ctypes
+    from ctypes import wintypes
+    user32 = ctypes.WinDLL("user32", use_last_error=True)
+    # 64 位 HWND 需按指针宽度传参，声明 argtypes 防整型截断
+    user32.EnumWindows.argtypes = [ctypes.WINFUNCTYPE(
+        wintypes.BOOL, wintypes.HWND, wintypes.LPARAM), wintypes.LPARAM]
+    user32.GetClassNameW.argtypes = [wintypes.HWND, wintypes.LPWSTR, ctypes.c_int]
+    user32.ShowWindow.argtypes = [wintypes.HWND, ctypes.c_int]
+    user32.SetForegroundWindow.argtypes = [wintypes.HWND]
+    user32.SetWindowPos.argtypes = [wintypes.HWND, wintypes.HWND,
+                                    ctypes.c_int, ctypes.c_int, ctypes.c_int,
+                                    ctypes.c_int, ctypes.c_uint]
+    user32.keybd_event.argtypes = [wintypes.BYTE, wintypes.BYTE,
+                                   wintypes.DWORD, ctypes.c_void_p]
+    return user32
+
+
+def _explorer_handles() -> set:
+    """枚举当前所有资源管理器文件夹窗口的 HWND 集合。"""
+    import ctypes
+    from ctypes import wintypes
+    user32 = _user32()
+    found = set()
+    callback_t = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
+
+    def _cb(hwnd, _lparam):
+        buf = ctypes.create_unicode_buffer(256)
+        user32.GetClassNameW(int(hwnd), buf, 256)
+        if buf.value in _EXPLORER_CLASSES:
+            found.add(int(hwnd))
+        return True
+
+    user32.EnumWindows(callback_t(_cb), 0)
+    return found
+
+
+def _raise_explorer_window(hwnd: int) -> None:
+    """把指定资源管理器窗口恢复并置顶到最上层（含前台激活）。"""
+    user32 = _user32()
+    user32.ShowWindow(hwnd, _SW_RESTORE)
+    # 前台锁：先试直接激活；失败则模拟 ALT 按键事件获得前台切换权限后重试
+    if not user32.SetForegroundWindow(hwnd):
+        user32.keybd_event(_VK_MENU, 0, 0, 0)
+        try:
+            user32.SetForegroundWindow(hwnd)
+        finally:
+            user32.keybd_event(_VK_MENU, 0, 2, 0)
+    user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0,
+                        _SWP_NOMOVE | _SWP_NOSIZE | _SWP_SHOWWINDOW)
+
+
+def _raise_new_explorer_window(before: set, timeout_s: float = 2.0) -> None:
+    """等待新打开的资源管理器窗口出现并置顶；找不到则静默放弃（不影响打开）。"""
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        new = _explorer_handles() - before
+        if new:
+            _raise_explorer_window(max(new))  # 句柄值随创建时间递增，取最新
+            return
+        time.sleep(0.05)
+
+
 def _open_in_file_manager(target: Path) -> None:
-    """用系统文件管理器打开目录（Windows/macOS/Linux）。"""
+    """用系统文件管理器打开目录（Windows/macOS/Linux），Windows 下窗口置顶。"""
     if sys.platform.startswith("win"):
+        before = _explorer_handles()
         os.startfile(str(target))  # type: ignore[attr-defined]
+        try:
+            _raise_new_explorer_window(before)
+        except Exception:
+            pass  # 置顶失败不影响目录打开
     elif sys.platform == "darwin":
         subprocess.Popen(["open", str(target)])
     else:
