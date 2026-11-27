@@ -14,7 +14,7 @@
 | 升位规则 | `0.x` 期：模块级功能里程碑 → MINOR；同模块内迭代/优化/修复 → PATCH |
 | 版本单一来源 | `electron/package.json` 的 `version`；安装包名、exe 属性、`/api/health`、「设置 → 关于」均读该值 |
 | 版本透传链 | 桌面壳以 `TJZK_APP_VERSION` 环境变量传给冻结后端 → `backend/config.py` 的 `APP_VERSION`（开发态回退读 `electron/package.json`） |
-| Git tag | 注解 tag `vX.Y.Z`，与 `electron/package.json` 对齐；**截至 V0.5.9 仓库尚无任何 tag**（旧 v1.0.0/v1.1.0 未打过 tag、未发 GitHub Release），`v0.5.9` 将是新编号体系首个 tag |
+| Git tag | 注解 tag `vX.Y.Z`，与 `electron/package.json` 对齐；**`v0.6.0` 为新编号体系首个 tag（2026-11-28 已推送并发布首份 GitHub Release）**；旧 v1.0.0/v1.1.0 未打过 tag、未发 Release，V0.5.5 及以前回填编号不追溯打 tag |
 | 提交规范 | Conventional Commits（见 AGENTS.md） |
 | 记录分工 | `VERSIONS.md`＝版本级索引；`LOG.md`＝任务级一行日志；`docs/update_report/`、`docs/bug_report/`＝详细归档；`docs/prd/`＝需求基线 |
 | 桌面发布流程 | 冻结验证（pytest → frontend build → 载荷重建 → smoke）→ 版本提交 → 注解 tag → 走代理推送（AGENTS.md Git 工作流）→ 产物 + SHA256 → `gh release create` |
@@ -30,7 +30,7 @@
 
 ## 二、版本历史（追溯重构）
 
-### V0.6.0 —— 当前基线（2026-11-27，桌面端与安装包已产出）
+### V0.6.0 —— 当前基线 · 已发布（2026-11-27 构建，2026-11-28 打 tag 并发布 GitHub Release）
 
 **主题：移除「新建数据集」功能，数据集管理收敛为扫描载入 + 统一管理分析（数据治理能力推迟独立立项）**
 
@@ -46,7 +46,9 @@
   - 冻结后端载荷 `electron/backend-dist/TianJianZhiKanBackend/`：3,384 文件 / 851.5 MB；打包静态资源已含 `DatasetImport` 版 chunk，旧 `DatasetNew-*` chunk 随重建消失。
   - 便携目录 `electron/dist/win-unpacked`：3,456 文件 / 1,119.4 MB，`TianJianZhiKan.exe` 文件版本 **0.6.0**。
   - NSIS 安装包 `electron/dist/TianJianZhiKan-v0.6.0-win-x64-setup.exe`：382,878,586 B（365.1 MiB），SHA256 `763965809A67B5975EC472FAD9080A15488B0E7DB4E0F844C84015973DB33AA4`。
+  - 便携 zip `electron/dist/TianJianZhiKan-v0.6.0-win-x64.zip`：496,792,824 B（473.8 MiB），SHA256 `4880EAE30BF991A82CD19364A57363D344296D5D104F97700EF529556768C45D`；干净目录解压验证通过（3,457 文件与源目录一致，解压版冒烟就绪 2.5s、窗口 2.9s、推理 3,284ms 成功 3 检出、退出码 0）。
   - 冒烟：开发态就绪 2.5s、health `v0.6.0`、11 模型、单图推理 2,954ms 成功（3 检出）；打包态（win-unpacked `--smoke`）就绪 2.9s、窗口可见 3.3s、health `v0.6.0`、推理 3,011ms 成功（3 检出）。
+  - **GitHub Release（2026-11-28）**：https://github.com/luoqianshi/Field-Insight/releases/tag/v0.6.0 ，资产 zip + setup.exe + SHA256SUMS.txt 三件套；Release notes 归档 `docs/releases/v0.6.0.md`。远端仓库已更名 `luoqianshi/Field-Insight`（旧 URL 自动重定向）。
 
 ### V0.5.9 ——（2026-11-27，桌面端与安装包已产出）
 
@@ -197,12 +199,12 @@
 
 ## 三、发版计划
 
-### V0.6.0 发布清单（打包已完成，待提交/打 tag/推送）
+### V0.6.0 发布清单（已完成：2026-11-28 发布）
 
 1. 冻结验证：`cd backend; python -m pytest -q` 全绿（186 passed）→ `cd frontend; npm run build` 通过 → `electron\build-backend.ps1 -PythonExe C:\Users\lqs\UAVDesktopBuild\venv\Scripts\python.exe` 重建载荷 → 开发态与打包态 `npm run smoke` 均通过（health `v0.6.0`）。
 2. 版本号已升至 `0.6.0`（`electron/package.json` 单一来源，`backend/config.py` 回退默认值同步），本文件已更新。
 3. 产物已产出：`npm run build:dir` → `win-unpacked`（3,456 文件 / 1,119.4 MB，exe 文件版本 0.6.0）；`npm run build:installer` → `TianJianZhiKan-v0.6.0-win-x64-setup.exe`（382,878,586 B / 365.1 MiB，SHA256 `763965809A67B5975EC472FAD9080A15488B0E7DB4E0F844C84015973DB33AA4`）。
-4. 待执行：提交（V0.5.9 清单中的提交/tag/推送步骤一并并入本版执行，首个 tag 改为 `v0.6.0`）→ 打注解 tag `v0.6.0` → 按 AGENTS.md Git 工作流走本地系统代理推送 → `gh release create v0.6.0` 上传安装包（Release notes 注明未签名 SmartScreen「更多信息 → 仍要运行」）。
+4. 已完成（2026-11-28）：提交 `479c374`（Release notes 归档 `docs/releases/v0.6.0.md`、AGENTS.md 发布约定修订为 zip+安装包+SHA256 三件套）→ 注解 tag `v0.6.0` → 走代理推送 master+tag → `gh release create v0.6.0` 上传 zip + setup.exe + SHA256SUMS.txt（notes 已注明未签名 SmartScreen「更多信息 → 仍要运行」）→ Release：https://github.com/luoqianshi/Field-Insight/releases/tag/v0.6.0 。V0.5.9 清单的提交/tag/推送步骤已并入本版执行。
 
 ### V0.5.9 发布清单（打包已完成；提交/tag/推送步骤并入上方 V0.6.0 清单执行）
 

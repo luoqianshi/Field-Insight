@@ -59,3 +59,4 @@
 - [2026-11-27 16:45] build(desktop): 版本升至 0.5.9 并产出 Electron 便携目录（3,457 文件/1,119.5MB）与 NSIS 安装包（SHA256 CDDD0016…9C56），pytest 186 passed、开发态与打包态冒烟通过，VERSIONS.md 同步 V0.5.9
 - [2026-11-27 18:10] feat(dataset): 移除「新建数据集」功能——DatasetNew 构建向导删除改为 DatasetImport 载入页（路由 dataset-new→dataset-import），列表/详情/首页入口与类型收窄清理，删除 backend/mock/datasets.json 与 config 死配置 MOCK_DIR/MOCK_IMAGES_DIR，PRD 出入说明归档 docs/sdd/specs/2026-11-27
 - [2026-11-27 18:10] build(desktop): 版本升至 0.6.0 并产出 Electron 便携目录（3,456 文件/1,119.4MB）与 NSIS 安装包（382,878,586 B，SHA256 76396580…33AA4），pytest 186 passed、前端构建、开发态与打包态冒烟通过（health v0.6.0），VERSIONS.md 同步 V0.6.0
+- [2026-11-28 01:15] chore(release): 发布 v0.6.0 首个 tag 与 GitHub Release（zip+安装包+SHA256 三件套），notes 归档 docs/releases/，AGENTS 发布约定修订，VERSIONS 回写发布状态
