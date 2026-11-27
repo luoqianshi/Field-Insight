@@ -10,8 +10,8 @@ from flask import Blueprint, Response, jsonify, request
 
 import config
 from config import IMAGE_EXTENSIONS, PROJECT_ROOT
-from core.engine import (get_processing_engine, get_processing_registry,
-                          get_processing_task_manager)
+from core.engine import (get_batch_registry, get_processing_engine,
+                          get_processing_registry, get_processing_task_manager)
 
 processing_bp = Blueprint("processing", __name__)
 
@@ -33,12 +33,37 @@ def _resolve_path(path_str):
     return p
 
 
-def _validate_input_paths(input_paths):
-    """输入源安全校验：仅允许已上传架次数据根（data/）或加工产物根（output/）下的目录。
+def _registered_batch_roots():
+    """已登记架次的图片目录集合（resolve 后）。
 
-    拒绝任意自定义目录与路径穿越；返回错误信息，None 表示通过。
+    架次在数据管理登记后即视为受管输入源（含自定义/绝对路径登记的架次），
+    相对路径按 PROJECT_ROOT 解析，与 BatchRegistry._resolve_path 一致。
+    """
+    roots = set()
+    br = get_batch_registry()
+    if br is None:
+        return roots
+    for cfg in br.list_batches():
+        raw = cfg.get("image_folder_path")
+        if not isinstance(raw, str) or not raw.strip():
+            continue
+        p = Path(raw.strip())
+        if not p.is_absolute():
+            p = Path(config.PROJECT_ROOT) / p
+        try:
+            roots.add(p.resolve())
+        except OSError:
+            continue
+    return roots
+
+
+def _validate_input_paths(input_paths):
+    """输入源安全校验：仅允许已登记架次的图片目录、架次数据根（data/）或加工产物根（output/）下的目录。
+
+    拒绝任意未登记的自定义目录与路径穿越；返回错误信息，None 表示通过。
     """
     roots = [Path(config.DATA_DIR).resolve(), Path(config.OUTPUT_DIR).resolve()]
+    batch_roots = _registered_batch_roots()
     for raw in input_paths:
         if not isinstance(raw, str) or not raw.strip():
             return "输入源路径非法"
@@ -46,7 +71,9 @@ def _validate_input_paths(input_paths):
         if not p.is_absolute():
             p = Path(config.PROJECT_ROOT) / p
         rp = p.resolve()
-        if not any(rp == root or root in rp.parents for root in roots):
+        managed = any(rp == root or root in rp.parents for root in roots)
+        registered = any(rp == b or b in rp.parents for b in batch_roots)
+        if not (managed or registered):
             return f"输入源仅支持已上传架次或加工产物目录，不允许自定义目录: {raw}"
         if not rp.is_dir():
             return f"输入源目录不存在: {raw}"

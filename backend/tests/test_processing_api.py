@@ -127,6 +127,33 @@ def test_submit_accepts_processed_output(client, tmp_path):
     assert r.get_json()["success"] is True
 
 
+def test_submit_accepts_registered_external_batch(client, tmp_path, monkeypatch):
+    """已登记架次的外部目录（data/output 根之外）可作为处理输入。"""
+    fixtures = Path(__file__).parent / "fixtures" / "sample_images"
+    ext = tmp_path / "external_imgs"
+    ext.mkdir()
+    shutil.copy(fixtures / "small_640.jpg", ext / "DJI_0001.jpg")
+
+    from core import engine
+    from core.batch_registry import BatchRegistry
+    br = BatchRegistry(tmp_path / "data", tmp_path / "batches.yaml")
+    br.create_batch({
+        "batch_name": "外部架次",
+        "crop_type": "甘蔗",
+        "flight_date": "2026-11-27",
+        "image_folder_path": str(ext),
+    })
+    monkeypatch.setattr(engine, "batch_registry", br)
+
+    r = client.post("/api/processing/clahe", json={
+        "name": "外部架次输入",
+        "input_paths": [str(ext)],
+        "params": {"clip_limit": 2.0, "grid_size": [8, 8]},
+    })
+    assert r.status_code == 200
+    assert r.get_json()["success"] is True
+
+
 def test_get_task_not_found(client):
     """查询不存在的任务返回 404。"""
     r = client.get("/api/processing/tasks/nonexistent_001")
