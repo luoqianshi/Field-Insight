@@ -38,12 +38,14 @@
 - **设置页双栏底部对齐**（`594f9e7`，Settings.vue）：外层栅格去掉 `items-start`，右栏改 flex 列并对【关于】卡加 `flex-1` 撑满，左右两栏谁高谁矮都能对齐（1280/1440/1920 宽实测 bottom 616/455/579 完全一致）；窄于 1280px 自动纵向堆叠。
 - **存储路径快捷操作**（`594f9e7`，Settings.vue + settings_api.py + settings.ts）：当前根目录与 5 个模块目录路径**双击复制完整路径**（复制接口原始值，不受界面截断影响；Clipboard API 被拒时回退 `execCommand`，右下角提示「已复制路径」）；新增根目录「打开目录」按钮与各模块文件夹图标，对应后端新端点 `POST /api/settings/open-folder`——只接受受管目录标识（`root|data|output|datasets|results|models|config`），路径由后端解析、缺失时 mkdir 后交给系统文件管理器打开（Windows `os.startfile` / macOS `open` / Linux `xdg-open`），拒绝前端传入任意路径。
 - **修复：打开目录窗口置顶**（2026-11-27，settings_api.py）：Windows 下 explorer 新窗口受前台锁限制会被拥有焦点的应用窗口压在底层，打开后改为识别新出现的资源管理器窗口（`CabinetWClass` 枚举对比）并置顶激活——`ShowWindow(SW_RESTORE)` → `SetForegroundWindow`（被拒时模拟 ALT 按键事件解锁前台权限重试）→ `SetWindowPos(HWND_TOP)`；复用已有窗口的场景由 explorer 自身激活（实测同样到前台）；打开行为不受置顶失败影响。新增 4 个窗口置顶单元测试（新窗口识别/句柄选取/超时静默/ALT 回退）。
+- **修复：自定义路径架次可作处理输入**（2026-11-27，processing_api.py）：数据管理允许任意本机目录登记架次，但数据处理输入源白名单只放行 `data/`、`output/` 根下目录，导致自定义路径登记的架次提交 CLAHE/裁切一律 400。改为白名单并入**已登记架次的目录树**（`batch_registry.list_batches()` 逐项 `resolve` 后比对，相对路径与 BatchRegistry 同基准按 PROJECT_ROOT 解析），未登记目录仍拒绝、路径穿越防护不变；新增已登记外部架次可提交用例，后端全套 **186 passed**。
 - **测试**：open-folder 用例（非法 key 400、受管目录、根目录、冻结态 `config`）+ 窗口置顶 4 用例，后端全套 **185 passed**；前端 `vue-tsc --noEmit && vite build` 通过。
 - **产物与验证**：
   - 冻结后端载荷 `electron/backend-dist/TianJianZhiKanBackend/`：3,382 文件 / 851.5 MB；直接启动打包后端校验 `/api/health` 返回 `v0.5.8`、`/api/settings/open-folder` 路由存在（非法 key 400）；**窗口置顶修复在冻结载荷实测通过**（新开窗口 `is_foreground=True`、Z 序顶端，取证脚本 `.lqs/2026-11-27/open-folder-topfix/outputs/`）。
   - 便携目录 `electron/dist/win-unpacked`：3,455 文件 / 1,119.5 MB，`TianJianZhiKan.exe` 文件版本 **0.5.8**；打包前端已含新设置页逻辑（产物 `Settings-*.js` 含 `open-folder` 调用）。
-  - NSIS 安装包 `electron/dist/TianJianZhiKan-v0.5.8-win-x64-setup.exe`：382,879,127 B（365.1 MiB），文件版本 0.5.8，SHA256 `C9881154B7CDDE403AB2E942E8D535C34A1023BB809EA1E960D7C57375722C5E`（2026-11-27 含窗口置顶修复的重建版；首版 `6647665B…A7F52` 已被此版替代）。
+  - NSIS 安装包 `electron/dist/TianJianZhiKan-v0.5.8-win-x64-setup.exe`：382,879,127 B（365.1 MiB），文件版本 0.5.8，SHA256 `915F39DB86917407FC5507EB1DA538E86D21BCECAEC7FF809584D576F0FB55B2`（2026-11-27 含输入源白名单修复的重建版；历史链：`6647665B…A7F52` 首版 → `C9881154…22C5E` 窗口置顶修复版 → 此版）。
   - 开发态冒烟（`npm run smoke`）：后端 2.9s 就绪、health `v0.5.8`、11 个模型、单图推理 2,992ms 成功（3 个检出）。
+  - 重建验证（2026-11-27 输入源修复版）：开发态冒烟就绪 2.6s、推理 3,685ms 成功；打包态冒烟（win-unpacked `TianJianZhiKan.exe --smoke`）就绪 0.9s、health `v0.5.8`、11 模型、推理 3,053ms 成功（3 个检出）。
   - 静默安装（`setup.exe /S /D=%TEMP%\tjzk-install-v058`）：退出码 0、38.0s，安装目录 exe 版本 0.5.8、卸载器与桌面「田间智瞰」快捷方式齐全；安装版冒烟 health `v0.5.8`、11 模型、单图推理 2,960ms 成功。
   - 卸载（`Uninstall TianJianZhiKan.exe /S`）：退出码 0，快捷方式与卸载注册表项清理干净、安装目录仅剩空目录（已知问题），`%LOCALAPPDATA%\TianJianZhiKan` 业务数据 443 个文件保留。
 
@@ -166,7 +168,7 @@
 
 1. 冻结验证：`cd backend; python -m pytest -q` 全绿（185 passed）→ `cd frontend; npm run build` → `electron\build-backend.ps1 -PythonExe C:\Users\lqs\UAVDesktopBuild\venv\Scripts\python.exe` 重建载荷（3,382 文件 / 851.5 MB）→ `cd electron; npm run smoke`（v0.5.8 通过）。
 2. 版本号已升至 `0.5.8`（`electron/package.json` 单一来源，`backend/config.py` 回退默认值同步），本文件已更新。
-3. 产物已产出：`npm run build:dir` → `win-unpacked`（3,455 文件 / 1,119.5 MB）；`npm run build:installer` → `TianJianZhiKan-v0.5.8-win-x64-setup.exe`（382,879,127 B / 365.1 MiB，SHA256 `C9881154B7CDDE403AB2E942E8D535C34A1023BB809EA1E960D7C57375722C5E`，2026-11-27 含窗口置顶修复的重建版）。
+3. 产物已产出：`npm run build:dir` → `win-unpacked`（3,455 文件 / 1,119.5 MB）；`npm run build:installer` → `TianJianZhiKan-v0.5.8-win-x64-setup.exe`（382,879,127 B / 365.1 MiB，SHA256 `915F39DB86917407FC5507EB1DA538E86D21BCECAEC7FF809584D576F0FB55B2`，2026-11-27 含输入源白名单修复的重建版）。
 4. 安装/卸载验证已完成（静默安装 + 安装版冒烟 + 静默卸载）；窗口置顶修复已在冻结载荷实测（新窗口 `is_foreground=True`）。
 5. 待执行：提交版本号与文档变更 → 打注解 tag `v0.5.8`（新编号体系首个正式 tag）→ 按 AGENTS.md Git 工作流走本地系统代理推送 → `gh release create v0.5.8` 上传安装包（Release notes 注明未签名 SmartScreen「更多信息 → 仍要运行」）。
 

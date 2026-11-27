@@ -53,3 +53,4 @@
 - [2026-11-27 00:57] fix(settings): 打开目录后资源管理器窗口置顶激活（ctypes 识别新窗口+SetForegroundWindow/ALT 解锁+HWND_TOP），冻结载荷实测新窗口到前台；重建 V0.5.8 便携目录与安装包（新 SHA256 C9881154…22C5E），测试 185 passed
 - [2026-11-27 14:48] fix(process): 输入源白名单放行已登记架次目录（含自定义路径架次），未登记目录仍拒绝
 - [2026-11-27 15:12] build(desktop): 重建 Electron 后端载荷（含输入源白名单修复），冒烟通过（health/models/推理）
+- [2026-11-27 15:33] build(desktop): 重建 V0.5.8 便携目录与 NSIS 安装包（输入源修复载荷），开发态与打包态冒烟通过，VERSIONS.md 同步新 SHA256 915F39DB
