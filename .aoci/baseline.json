@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-11-25T05:23:44Z",
-  "updated_at": "2026-11-27T07:32:44Z",
+  "updated_at": "2026-11-27T08:46:57Z",
   "files": {
     ".gitattributes": {
       "role": "index",
@@ -839,9 +839,9 @@
     },
     "LOG.md": {
       "role": "index",
-      "sha256": "4602db993518edace7a029471fb9c89a0b4acedf0d99f8a5d72a9ee21e55b44f",
-      "size": 7781,
-      "normalized_sha256": "95e8da848788eb94fa448d919cbf9b2eff63770fc706519d6d9cd36842e2b3b1"
+      "sha256": "142261c6758351d40f45bfbbeb9e063be686582b4acbc1d8b9283fa066cd40fa",
+      "size": 8472,
+      "normalized_sha256": "c05a4c783d8007c6a30cde45e80ee94282bbbc402f815873a7bea195a0ed8dc1"
     },
     "README.md": {
       "role": "index",
@@ -851,15 +851,15 @@
     },
     "VERSIONS.md": {
       "role": "index",
-      "sha256": "e54e741efb8c22cf3384870cd06858c32f735cb561f0155f2880e8489137e3e4",
-      "size": 24705,
-      "normalized_sha256": "e54e741efb8c22cf3384870cd06858c32f735cb561f0155f2880e8489137e3e4"
+      "sha256": "fffbfa5f66d4404469d98b6edfd4035a0f327006ff3d3af195c997279f2ff0ab",
+      "size": 28488,
+      "normalized_sha256": "fffbfa5f66d4404469d98b6edfd4035a0f327006ff3d3af195c997279f2ff0ab"
     },
     "aoci.code.txt": {
       "role": "index",
-      "sha256": "496e63d21c5c989d23ff87e5efeeb387fda3b4d43b458bdf14896ec41486c17a",
-      "size": 92657,
-      "normalized_sha256": "496e63d21c5c989d23ff87e5efeeb387fda3b4d43b458bdf14896ec41486c17a"
+      "sha256": "41cc71b2dbbabf49f53274dc64e0b4748a1bfe626fe990ebe24b2003da266667",
+      "size": 94251,
+      "normalized_sha256": "41cc71b2dbbabf49f53274dc64e0b4748a1bfe626fe990ebe24b2003da266667"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -945,9 +945,9 @@
     },
     "backend/config.py": {
       "role": "index",
-      "sha256": "be28bcdb304c8d7e2c151cbb775c94fcad50017a15c047cbf819cd131b31af0f",
+      "sha256": "c541487211a3c5f342e6ef26f5a1efec97d8554168896b6a9a547fe7e6030bd1",
       "size": 6392,
-      "normalized_sha256": "eae498c702d77aa90a1e8631211399399a0e00c2b48b420584df1f8fb675616e"
+      "normalized_sha256": "85bb738330e758ac5d032d48a924d84042073d206b6d61bacb03164dc8f68138"
     },
     "backend/conftest.py": {
       "role": "index",
@@ -2367,9 +2367,9 @@
     },
     "electron/package.json": {
       "role": "index",
-      "sha256": "1a961305b42b9d18fa466be4721a2cd9c2bcceeb528b73737b992f374585db8c",
+      "sha256": "420cf816e83f869e3824c63a579d9a301aff88ae317a017e32519c35a8fa958b",
       "size": 1659,
-      "normalized_sha256": "1a961305b42b9d18fa466be4721a2cd9c2bcceeb528b73737b992f374585db8c"
+      "normalized_sha256": "420cf816e83f869e3824c63a579d9a301aff88ae317a017e32519c35a8fa958b"
     },
     "electron/preload.js": {
       "role": "index",
@@ -2521,6 +2521,12 @@
       "size": 13803,
       "normalized_sha256": "434618bb6264a3b189ea7faa0bf015f9051cd453ad3786a68c693a9d86add11a"
     },
+    "frontend/src/components/common/PaginationBar.vue": {
+      "role": "index",
+      "sha256": "0d404eec6e3133d0d0a58b86ff47406a3ee35672a2c853243d686c4ff9b9cbd1",
+      "size": 3157,
+      "normalized_sha256": "0d404eec6e3133d0d0a58b86ff47406a3ee35672a2c853243d686c4ff9b9cbd1"
+    },
     "frontend/src/components/common/PathText.vue": {
       "role": "index",
       "sha256": "7b528c7a68312d8a5414e89f1b1fe4475ce6ee3aecc1dfaa0beea4a4d54e97c7",
@@ -2568,6 +2574,12 @@
       "sha256": "00d18518a64352e7693beba5786ef33cae05f449b2a7901c3fc2c82262e6da55",
       "size": 22512,
       "normalized_sha256": "00d18518a64352e7693beba5786ef33cae05f449b2a7901c3fc2c82262e6da55"
+    },
+    "frontend/src/composables/useAdaptivePagination.ts": {
+      "role": "index",
+      "sha256": "eae88be038bf017773a114e98dfb97cceaeb42713343558bf773f53e9cbb0406",
+      "size": 3920,
+      "normalized_sha256": "eae88be038bf017773a114e98dfb97cceaeb42713343558bf773f53e9cbb0406"
     },
     "frontend/src/env.d.ts": {
       "role": "index",
@@ -2655,9 +2667,9 @@
     },
     "frontend/src/views/data/BatchDetail.vue": {
       "role": "index",
-      "sha256": "16df9415621b899123ec264a37ab75d7624db51aa379f0555b53efda1efe229c",
-      "size": 20160,
-      "normalized_sha256": "16df9415621b899123ec264a37ab75d7624db51aa379f0555b53efda1efe229c"
+      "sha256": "33ba53cf5e6436efe583bebd2c01c866d4cad04c4fa1e0f058cd3107d096d648",
+      "size": 19466,
+      "normalized_sha256": "33ba53cf5e6436efe583bebd2c01c866d4cad04c4fa1e0f058cd3107d096d648"
     },
     "frontend/src/views/data/BatchNew.vue": {
       "role": "index",
@@ -2667,21 +2679,21 @@
     },
     "frontend/src/views/data/Batches.vue": {
       "role": "index",
-      "sha256": "8eb37c88e272fe390247e58b2bf2414352bd59919c7de70eef57762f419c08d4",
-      "size": 10881,
-      "normalized_sha256": "8eb37c88e272fe390247e58b2bf2414352bd59919c7de70eef57762f419c08d4"
+      "sha256": "40833d8224681c0688b312b6a3d24bac11c90d0a0d1017955cc69a192c71dad8",
+      "size": 11574,
+      "normalized_sha256": "40833d8224681c0688b312b6a3d24bac11c90d0a0d1017955cc69a192c71dad8"
     },
     "frontend/src/views/data/Processed.vue": {
       "role": "index",
-      "sha256": "329f478516b29777c022c246521e7628b8c66ab9b3e1c5b8150ec578535c46e9",
-      "size": 7699,
-      "normalized_sha256": "329f478516b29777c022c246521e7628b8c66ab9b3e1c5b8150ec578535c46e9"
+      "sha256": "b1d34facb23ce5400ca1887cebdb07a87fef79cfae87e691f45c71836ea7c2b1",
+      "size": 8377,
+      "normalized_sha256": "b1d34facb23ce5400ca1887cebdb07a87fef79cfae87e691f45c71836ea7c2b1"
     },
     "frontend/src/views/data/ProcessedDetail.vue": {
       "role": "index",
-      "sha256": "61468bc3e3e6f77a46885485d3d88a3b9f5cdbf57e2f9ffa4ca317402e88260f",
-      "size": 11581,
-      "normalized_sha256": "61468bc3e3e6f77a46885485d3d88a3b9f5cdbf57e2f9ffa4ca317402e88260f"
+      "sha256": "2668535be19aeb2776e06540673ba6903a984a446fb5cbb437c2a57669231f05",
+      "size": 10580,
+      "normalized_sha256": "2668535be19aeb2776e06540673ba6903a984a446fb5cbb437c2a57669231f05"
     },
     "frontend/src/views/dataset/DatasetDetail.vue": {
       "role": "index",

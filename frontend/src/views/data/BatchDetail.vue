@@ -2,10 +2,11 @@
 import AppLayout from '@/components/layout/AppLayout.vue'
 import DataSubTabs from '@/components/layout/DataSubTabs.vue'
 import Icon from '@/components/common/Icon.vue'
+import PaginationBar from '@/components/common/PaginationBar.vue'
 import GeoLocationEditor, { type GeoValue } from '@/components/data/GeoLocationEditor.vue'
 import { batchesApi, type Batch, type BatchImage } from '@/api/batches'
 import { useRoute, useRouter } from 'vue-router'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -42,7 +43,6 @@ const lightboxOpen = computed(() => lightboxIdx.value >= 0)
 const totalSizeGb = computed(() =>
   ((batch.value?.total_size_bytes || 0) / (1024 ** 3)).toFixed(2),
 )
-const hasMore = computed(() => imagePage.value < totalPages.value)
 const imageFormats = computed(() => batch.value?.image_formats?.join(', ') || '-')
 
 function statusBadge(status: string): { cls: string; label: string } {
@@ -71,7 +71,7 @@ async function load() {
   try {
     const b = await batchesApi.get(id.value)
     batch.value = b.data
-    await loadImages(1, true)
+    await loadImages(1)
   } catch (e: any) {
     errorMsg.value = e.message || '加载架次详情失败'
   } finally {
@@ -79,17 +79,13 @@ async function load() {
   }
 }
 
-async function loadImages(page: number, reset: boolean = false) {
+async function loadImages(page: number) {
   if (loadingImages.value) return
   loadingImages.value = true
   try {
     const res = await batchesApi.listImages(id.value, { page, page_size: imagePageSize })
     const data = res.data
-    if (reset) {
-      images.value = data.images
-    } else {
-      images.value = [...images.value, ...data.images]
-    }
+    images.value = data.images
     imageTotal.value = data.total
     totalPages.value = data.total_pages
     imagePage.value = data.page
@@ -100,11 +96,10 @@ async function loadImages(page: number, reset: boolean = false) {
   }
 }
 
-function loadMore() {
-  if (hasMore.value) {
-    loadImages(imagePage.value + 1)
-  }
-}
+// 底部分页条翻页
+watch(imagePage, (p) => {
+  if (p > 0) loadImages(p)
+})
 
 function startEdit() {
   if (!batch.value) return
@@ -171,9 +166,6 @@ function prevImg() {
 function nextImg() {
   if (lightboxIdx.value < images.value.length - 1) {
     lightboxIdx.value++
-    if (lightboxIdx.value >= images.value.length - 3 && hasMore.value) {
-      loadMore()
-    }
   }
 }
 
@@ -366,7 +358,7 @@ onMounted(load)
       <div class="bg-white border border-surface-border rounded-card p-5">
         <div class="flex items-center justify-between mb-3">
           <h3 class="text-sm font-semibold text-ink-primary">原始图片</h3>
-          <span class="text-xs text-ink-tertiary">共 {{ imageTotal }} 张 · 已加载 {{ images.length }} 张</span>
+          <span class="text-xs text-ink-tertiary font-numeric">共 {{ imageTotal }} 张</span>
         </div>
         <div v-if="images.length === 0" class="py-10 text-center text-ink-tertiary text-sm">
           <i class="fa-regular fa-image text-2xl mb-2 block"></i>暂无图片
@@ -390,20 +382,14 @@ onMounted(load)
           </div>
         </div>
 
-        <!-- 加载更多 -->
-        <div v-if="images.length > 0" class="mt-4 flex flex-col items-center gap-2">
-          <button
-            v-if="hasMore"
-            type="button"
-            :disabled="loadingImages"
-            @click="loadMore"
-            class="px-5 py-2 border border-surface-border hover:bg-surface-hover text-ink-primary rounded-btn text-sm font-medium disabled:opacity-50"
-          >
-            <i v-if="loadingImages" class="fa-solid fa-circle-notch fa-spin mr-1"></i>
-            {{ loadingImages ? '加载中…' : '加载更多' }}
-          </button>
-          <span class="text-xs text-ink-tertiary">已加载 {{ images.length }} / {{ imageTotal }} 张</span>
-        </div>
+        <!-- 底部分页 -->
+        <PaginationBar
+          v-if="totalPages > 1"
+          v-model:page="imagePage"
+          :page-size="imagePageSize"
+          :total="imageTotal"
+          class="-mx-5 -mb-5 mt-4 border-t border-surface-border"
+        />
       </div>
     </template>
 

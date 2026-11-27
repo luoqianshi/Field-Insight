@@ -1,7 +1,7 @@
 # 版本管理与发版计划（VERSIONS）
 
 > 本文件是「田间智瞰」项目版本历史与发版计划的单一索引。
-> 2026-11-25 版本编号体系重构：旧桌面版本线 **v1.0.0 / v1.1.0 全部重置并入 V0.5.5 基线**；2026-11-24 的「无人机型号选择 + 地块地理位置」更新定为 **V0.5.6**；2026-11-25 的「数据处理模块风险收敛与长路径显示修复」定为 **V0.5.7**；2026-11-26 的「详情页/设置页布局对齐与存储路径快捷操作」定为 **V0.5.8（当前基线）**。历史文档（`docs/desktop-build-guide.md`、`.lqs/` 报告等）保留旧编号原文，以本文映射表对照，不回改。
+> 2026-11-25 版本编号体系重构：旧桌面版本线 **v1.0.0 / v1.1.0 全部重置并入 V0.5.5 基线**；2026-11-24 的「无人机型号选择 + 地块地理位置」更新定为 **V0.5.6**；2026-11-25 的「数据处理模块风险收敛与长路径显示修复」定为 **V0.5.7**；2026-11-26 的「详情页/设置页布局对齐与存储路径快捷操作」定为 **V0.5.8**；2026-11-27 的「数据管理列表与详情页动态分页」定为 **V0.5.9（当前基线）**。历史文档（`docs/desktop-build-guide.md`、`.lqs/` 报告等）保留旧编号原文，以本文映射表对照，不回改。
 > 历史细节来源：`docs/prd/`（PRD v1~v7）、`docs/update_report/`（001~012）、`docs/bug_report/`（001~011）、`LOG.md`、git 提交树（追溯重构，V0.5.5 及以前版本号为回填编号，非当时实际发布号）。
 
 ---
@@ -14,7 +14,7 @@
 | 升位规则 | `0.x` 期：模块级功能里程碑 → MINOR；同模块内迭代/优化/修复 → PATCH |
 | 版本单一来源 | `electron/package.json` 的 `version`；安装包名、exe 属性、`/api/health`、「设置 → 关于」均读该值 |
 | 版本透传链 | 桌面壳以 `TJZK_APP_VERSION` 环境变量传给冻结后端 → `backend/config.py` 的 `APP_VERSION`（开发态回退读 `electron/package.json`） |
-| Git tag | 注解 tag `vX.Y.Z`，与 `electron/package.json` 对齐；**截至 V0.5.8 仓库尚无任何 tag**（旧 v1.0.0/v1.1.0 未打过 tag、未发 GitHub Release），`v0.5.8` 将是新编号体系首个 tag |
+| Git tag | 注解 tag `vX.Y.Z`，与 `electron/package.json` 对齐；**截至 V0.5.9 仓库尚无任何 tag**（旧 v1.0.0/v1.1.0 未打过 tag、未发 GitHub Release），`v0.5.9` 将是新编号体系首个 tag |
 | 提交规范 | Conventional Commits（见 AGENTS.md） |
 | 记录分工 | `VERSIONS.md`＝版本级索引；`LOG.md`＝任务级一行日志；`docs/update_report/`、`docs/bug_report/`＝详细归档；`docs/prd/`＝需求基线 |
 | 桌面发布流程 | 冻结验证（pytest → frontend build → 载荷重建 → smoke）→ 版本提交 → 注解 tag → 走代理推送（AGENTS.md Git 工作流）→ 产物 + SHA256 → `gh release create` |
@@ -30,7 +30,22 @@
 
 ## 二、版本历史（追溯重构）
 
-### V0.5.8 —— 当前基线（2026-11-26，桌面端与安装包已产出）
+### V0.5.9 —— 当前基线（2026-11-27，桌面端与安装包已产出）
+
+**主题：数据管理列表与详情页动态分页（免滚动翻页浏览）**
+
+- **自适应分页组合式函数**（新增 `frontend/src/composables/useAdaptivePagination.ts`）：在滚动容器内实测数据行高与列表可用高度，动态计算每页行数（下限 2、上限 50；行高取自 `tr.data-row` 实测，测量含 scrollTop 校正）；数据不超单屏容量时保持整表展示，超出时自动切换底部分页；分页模式下锁定卡片最小高度防翻页跳动；列表长度变化自动回第 1 页；窗口 resize 自适应重算。
+- **底部分页条组件**（新增 `frontend/src/components/common/PaginationBar.vue`）：总条数/显示范围/页码位置 + 页码窗口（首尾页与当前页邻页、间隙省略号）+ 上/下页按钮，`v-model:page` 双向绑定，Emerald 主色激活态。
+- **列表页接入**（`Batches.vue` / `Processed.vue`）：原始架次与加工数据列表超出行数时切换为底部分页翻页浏览，顶部标题/统计卡片/筛选栏固定不动、无需滚动条。
+- **详情页图片改分页**（`BatchDetail.vue` / `ProcessedDetail.vue`）：原始图片（每页 36 张）与子目录缩略图由「加载更多」累积改为底部分页条翻页，单页仅保留当前页数据；架次详情灯箱翻到页尾预加载下一页的逻辑随之移除（浏览范围为当前页）。
+- **测试**：后端全套 **186 passed**；前端 `vue-tsc --noEmit && vite build` 通过。浏览器实测（:5000 托管态）：架次列表 9 条→3 页、搜索过滤后页码正确重置、翻页顶部零位移；加工数据列表 6 条→3 页；架次详情 80 张→3 页翻页正确；加工详情 5,040 张子图→140 页（页码窗口含省略号）翻页正确。
+- **产物与验证**：
+  - 冻结后端载荷 `electron/backend-dist/TianJianZhiKanBackend/`：3,384 文件 / 851.5 MB，打包静态资源已含 PaginationBar / BatchDetail 分页版 chunk。
+  - 便携目录 `electron/dist/win-unpacked`：3,457 文件 / 1,119.5 MB，`TianJianZhiKan.exe` 文件版本 **0.5.9**。
+  - NSIS 安装包 `electron/dist/TianJianZhiKan-v0.5.9-win-x64-setup.exe`：382,882,233 B（365.1 MiB），SHA256 `CDDD0016D99D21F810F16140D6BC0D57EDF5B57A326AD8286AE686EBF0229C56`。
+  - 冒烟：开发态就绪 2.5s、health `v0.5.9`、11 模型、单图推理 3,029ms 成功（3 检出）；打包态（win-unpacked `--smoke`）就绪 3.0s、窗口可见 3.3s、health `v0.5.9`、推理 2,997ms 成功。
+
+### V0.5.8 ——（2026-11-26，桌面端与安装包已产出）
 
 **主题：详情页与设置页布局对齐 + 存储路径双击复制/一键打开目录**
 
@@ -164,13 +179,20 @@
 
 ## 三、发版计划
 
-### V0.5.8 发布清单（打包已完成，待提交/打 tag/推送）
+### V0.5.9 发布清单（打包已完成，待提交/打 tag/推送）
+
+1. 冻结验证：`cd backend; python -m pytest -q` 全绿（186 passed）→ `cd frontend; npm run build` → `electron\build-backend.ps1 -PythonExe C:\Users\lqs\UAVDesktopBuild\venv\Scripts\python.exe` 重建载荷（3,384 文件 / 851.5 MB）→ 开发态与打包态 `npm run smoke` 均通过（health `v0.5.9`）。
+2. 版本号已升至 `0.5.9`（`electron/package.json` 单一来源，`backend/config.py` 回退默认值同步），本文件已更新。
+3. 产物已产出：`npm run build:dir` → `win-unpacked`（3,457 文件 / 1,119.5 MB，exe 文件版本 0.5.9）；`npm run build:installer` → `TianJianZhiKan-v0.5.9-win-x64-setup.exe`（382,882,233 B / 365.1 MiB，SHA256 `CDDD0016D99D21F810F16140D6BC0D57EDF5B57A326AD8286AE686EBF0229C56`）。
+4. 待执行：提交（合并 V0.5.8 期间已完成的窗口置顶/输入源修复与本次分页改动）→ 打注解 tag `v0.5.9`（取代原计划的 `v0.5.8`，作为新编号体系首个 tag）→ 按 AGENTS.md Git 工作流走本地系统代理推送 → `gh release create v0.5.9` 上传安装包（Release notes 注明未签名 SmartScreen「更多信息 → 仍要运行」）。
+
+### V0.5.8 发布清单（打包已完成；发布步骤已并入上方 V0.5.9 清单）
 
 1. 冻结验证：`cd backend; python -m pytest -q` 全绿（185 passed）→ `cd frontend; npm run build` → `electron\build-backend.ps1 -PythonExe C:\Users\lqs\UAVDesktopBuild\venv\Scripts\python.exe` 重建载荷（3,382 文件 / 851.5 MB）→ `cd electron; npm run smoke`（v0.5.8 通过）。
 2. 版本号已升至 `0.5.8`（`electron/package.json` 单一来源，`backend/config.py` 回退默认值同步），本文件已更新。
 3. 产物已产出：`npm run build:dir` → `win-unpacked`（3,455 文件 / 1,119.5 MB）；`npm run build:installer` → `TianJianZhiKan-v0.5.8-win-x64-setup.exe`（382,879,127 B / 365.1 MiB，SHA256 `915F39DB86917407FC5507EB1DA538E86D21BCECAEC7FF809584D576F0FB55B2`，2026-11-27 含输入源白名单修复的重建版）。
 4. 安装/卸载验证已完成（静默安装 + 安装版冒烟 + 静默卸载）；窗口置顶修复已在冻结载荷实测（新窗口 `is_foreground=True`）。
-5. 待执行：提交版本号与文档变更 → 打注解 tag `v0.5.8`（新编号体系首个正式 tag）→ 按 AGENTS.md Git 工作流走本地系统代理推送 → `gh release create v0.5.8` 上传安装包（Release notes 注明未签名 SmartScreen「更多信息 → 仍要运行」）。
+5. ~~待执行：提交版本号与文档变更 → 打注解 tag `v0.5.8`~~（已并入 V0.5.9 清单执行：V0.5.8 期间改动随 V0.5.9 一并提交，首个 tag 改为 `v0.5.9`）。
 
 > V0.5.7 的便携目录与安装包（`TianJianZhiKan-v0.5.7-win-x64-setup.exe`）已于 2026-11-25 产出并验证；V0.5.8 构建时 `electron/dist` 保留历史安装包，仅新增 0.5.8 产物。
 

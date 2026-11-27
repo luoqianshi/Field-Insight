@@ -3,14 +3,21 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import DataSubTabs from '@/components/layout/DataSubTabs.vue'
 import Icon from '@/components/common/Icon.vue'
 import PathText from '@/components/common/PathText.vue'
+import PaginationBar from '@/components/common/PaginationBar.vue'
+import { useAdaptivePagination } from '@/composables/useAdaptivePagination'
 import { processingApi, type ProcessedItem } from '@/api/processing'
 import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 
 const router = useRouter()
 const items = ref<ProcessedItem[]>([])
+const tableCard = ref<HTMLElement | null>(null)
 const loading = ref(false)
 const errorMsg = ref('')
+
+// 超出单屏可容纳行数时切换为底部分页浏览
+const { page, pageSize, paginated, pageItems, cardMinHeight } =
+  useAdaptivePagination(items, { target: tableCard })
 
 const stats = computed(() => {
   const claheCount = items.value.filter((i) => i.task_type === 'clahe').length
@@ -105,7 +112,11 @@ onMounted(load)
     </div>
 
     <!-- 加工数据列表表格 -->
-    <div class="bg-white border border-surface-border rounded-card overflow-hidden">
+    <div
+      ref="tableCard"
+      class="bg-white border border-surface-border rounded-card overflow-hidden"
+      :style="cardMinHeight ? { minHeight: cardMinHeight } : undefined"
+    >
       <table class="w-full text-sm">
         <thead class="bg-surface-bg text-xs text-ink-secondary">
           <tr>
@@ -137,10 +148,10 @@ onMounted(load)
             </td>
           </tr>
           <tr
-            v-for="item in items"
+            v-for="item in pageItems"
             v-else
             :key="item.task_id"
-            class="border-t border-surface-border cursor-pointer"
+            class="data-row border-t border-surface-border cursor-pointer"
             @click="goDetail(item)"
           >
             <td class="py-3 px-5">
@@ -168,6 +179,13 @@ onMounted(load)
           </tr>
         </tbody>
       </table>
+      <PaginationBar
+        v-if="paginated"
+        v-model:page="page"
+        :page-size="pageSize"
+        :total="items.length"
+        class="border-t border-surface-border"
+      />
     </div>
 
     <div class="mt-3 text-xs text-ink-tertiary flex items-center gap-1.5">

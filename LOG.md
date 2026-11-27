@@ -54,3 +54,6 @@
 - [2026-11-27 14:48] fix(process): 输入源白名单放行已登记架次目录（含自定义路径架次），未登记目录仍拒绝
 - [2026-11-27 15:12] build(desktop): 重建 Electron 后端载荷（含输入源白名单修复），冒烟通过（health/models/推理）
 - [2026-11-27 15:33] build(desktop): 重建 V0.5.8 便携目录与 NSIS 安装包（输入源修复载荷），开发态与打包态冒烟通过，VERSIONS.md 同步新 SHA256 915F39DB
+- [2026-11-27 15:57] feat(data): 数据管理列表动态分页（新增 useAdaptivePagination 与 PaginationBar，接入原始架次/加工数据列表页），超出行数切换底部分页免滚动浏览，前端已重新构建
+- [2026-11-27 16:11] refactor(data): 架次详情与加工数据详情图片由「加载更多」累积改为底部分页条翻页（复用 PaginationBar，单页仅保留当前页数据），前端已重新构建
+- [2026-11-27 16:45] build(desktop): 版本升至 0.5.9 并产出 Electron 便携目录（3,457 文件/1,119.5MB）与 NSIS 安装包（SHA256 CDDD0016…9C56），pytest 186 passed、开发态与打包态冒烟通过，VERSIONS.md 同步 V0.5.9

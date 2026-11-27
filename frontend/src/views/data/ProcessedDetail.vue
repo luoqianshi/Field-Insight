@@ -3,6 +3,7 @@ import AppLayout from '@/components/layout/AppLayout.vue'
 import DataSubTabs from '@/components/layout/DataSubTabs.vue'
 import Icon from '@/components/common/Icon.vue'
 import PathText from '@/components/common/PathText.vue'
+import PaginationBar from '@/components/common/PaginationBar.vue'
 import ImageViewer from '@/components/common/ImageViewer.vue'
 import { processingApi, type ProcessedItem, type TaskFile } from '@/api/processing'
 import { useRoute, useRouter } from 'vue-router'
@@ -16,7 +17,7 @@ const item = ref<ProcessedItem | null>(null)
 const loading = ref(true)
 const errorMsg = ref('')
 
-// 当前展开的子目录 + 该子目录已加载的图片列表（用于渐进式加载）
+// 当前展开的子目录 + 该子目录当前页的图片列表
 const expandedSubDir = ref<string | null>(null)
 const subDirFiles = ref<Record<string, { files: TaskFile[]; total: number; page: number; totalPages: number; loading: boolean }>>({})
 
@@ -53,7 +54,7 @@ async function load() {
     item.value = res.data
     if (item.value.sub_dirs.length > 0) {
       expandedSubDir.value = item.value.sub_dirs[0].sub_dir
-      await loadFiles(item.value.sub_dirs[0].sub_dir, 1, true)
+      await loadFiles(item.value.sub_dirs[0].sub_dir, 1)
     }
   } catch (e: any) {
     errorMsg.value = e.message || '加载失败'
@@ -62,7 +63,7 @@ async function load() {
   }
 }
 
-async function loadFiles(subDir: string, page: number, reset: boolean) {
+async function loadFiles(subDir: string, page: number) {
   if (!item.value) return
   const cur = subDirFiles.value[subDir] || { files: [], total: 0, page: 0, totalPages: 1, loading: false }
   if (cur.loading) return
@@ -74,14 +75,16 @@ async function loadFiles(subDir: string, page: number, reset: boolean) {
       page,
       page_size: IMAGE_PAGE_SIZE,
     })
-    const next = {
-      files: reset ? res.data.files : [...(cur.files || []), ...res.data.files],
-      total: res.data.total,
-      page: res.data.page,
-      totalPages: res.data.total_pages,
-      loading: false,
+    subDirFiles.value = {
+      ...subDirFiles.value,
+      [subDir]: {
+        files: res.data.files,
+        total: res.data.total,
+        page: res.data.page,
+        totalPages: res.data.total_pages,
+        loading: false,
+      },
     }
-    subDirFiles.value = { ...subDirFiles.value, [subDir]: next }
   } catch {
     subDirFiles.value = { ...subDirFiles.value, [subDir]: { ...cur, loading: false } }
   }
@@ -93,16 +96,8 @@ async function toggleSubDir(subDir: string) {
   } else {
     expandedSubDir.value = subDir
     if (!subDirFiles.value[subDir]) {
-      await loadFiles(subDir, 1, true)
+      await loadFiles(subDir, 1)
     }
-  }
-}
-
-function loadMore(subDir: string) {
-  const cur = subDirFiles.value[subDir]
-  if (!cur || cur.loading) return
-  if (cur.page < cur.totalPages) {
-    loadFiles(subDir, cur.page + 1, false)
   }
 }
 
@@ -203,7 +198,7 @@ onMounted(load)
         </div>
       </div>
 
-      <!-- 子目录与图片（渐进式加载） -->
+      <!-- 子目录与图片（分页加载） -->
       <div class="space-y-3">
         <div
           v-for="sub in item.sub_dirs"
@@ -255,24 +250,15 @@ onMounted(load)
                 </div>
               </div>
 
-              <!-- 加载更多 -->
-              <div class="mt-4 flex flex-col items-center gap-2">
-                <template v-if="subDirFiles[sub.sub_dir].page < subDirFiles[sub.sub_dir].totalPages">
-                  <button
-                    type="button"
-                    :disabled="subDirFiles[sub.sub_dir].loading"
-                    @click="loadMore(sub.sub_dir)"
-                    class="px-5 py-2 border border-surface-border hover:bg-surface-hover text-ink-primary rounded-btn text-sm font-medium disabled:opacity-50 inline-flex items-center gap-1.5"
-                  >
-                    <Icon v-if="subDirFiles[sub.sub_dir].loading" name="spinner" :size="14" :spin="true" />
-                    {{ subDirFiles[sub.sub_dir].loading ? '加载中…' : '加载更多' }}
-                  </button>
-                </template>
-                <span class="text-xs text-ink-tertiary font-numeric">
-                  已加载 {{ subDirFiles[sub.sub_dir].files.length }} / {{ subDirFiles[sub.sub_dir].total }} 张
-                  <span v-if="subDirFiles[sub.sub_dir].page >= subDirFiles[sub.sub_dir].totalPages">· 已全部加载</span>
-                </span>
-              </div>
+              <!-- 底部分页 -->
+              <PaginationBar
+                v-if="subDirFiles[sub.sub_dir].totalPages > 1"
+                :page="subDirFiles[sub.sub_dir].page"
+                :page-size="IMAGE_PAGE_SIZE"
+                :total="subDirFiles[sub.sub_dir].total"
+                class="-mx-5 -mb-5 mt-4 border-t border-surface-border"
+                @update:page="(p) => loadFiles(sub.sub_dir, p)"
+              />
             </div>
           </div>
         </div>

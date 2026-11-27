@@ -2,11 +2,15 @@
 import AppLayout from '@/components/layout/AppLayout.vue'
 import DataSubTabs from '@/components/layout/DataSubTabs.vue'
 import Icon from '@/components/common/Icon.vue'
+import PaginationBar from '@/components/common/PaginationBar.vue'
+import { useAdaptivePagination } from '@/composables/useAdaptivePagination'
 import { batchesApi, type Batch } from '@/api/batches'
 import { useRouter } from 'vue-router'
 import { ref, computed, onMounted } from 'vue'
 
 const router = useRouter()
+
+const tableCard = ref<HTMLElement | null>(null)
 
 const batches = ref<Batch[]>([])
 const summary = ref({
@@ -92,6 +96,10 @@ async function deleteBatch(b: Batch) {
 }
 
 onMounted(applyFilters)
+
+// 超出单屏可容纳行数时切换为底部分页浏览
+const { page, pageSize, totalPages, paginated, pageItems, cardMinHeight } =
+  useAdaptivePagination(batches, { target: tableCard })
 
 function goDetail(b: Batch) {
   router.push(`/data/batches/${b.batch_id}`)
@@ -186,7 +194,11 @@ function goDetail(b: Batch) {
     </div>
 
     <!-- 架次列表表格 -->
-    <div class="bg-white border border-surface-border rounded-card overflow-hidden">
+    <div
+      ref="tableCard"
+      class="bg-white border border-surface-border rounded-card overflow-hidden"
+      :style="cardMinHeight ? { minHeight: cardMinHeight } : undefined"
+    >
       <table class="w-full text-sm">
         <thead class="bg-surface-bg text-xs text-ink-secondary">
           <tr>
@@ -220,10 +232,10 @@ function goDetail(b: Batch) {
             </td>
           </tr>
           <tr
-            v-for="b in batches"
+            v-for="b in pageItems"
             v-else
             :key="b.batch_id"
-            class="border-t border-surface-border cursor-pointer"
+            class="data-row border-t border-surface-border cursor-pointer"
             @click="goDetail(b)"
           >
             <td class="py-3 px-5">
@@ -253,6 +265,13 @@ function goDetail(b: Batch) {
           </tr>
         </tbody>
       </table>
+      <PaginationBar
+        v-if="paginated"
+        v-model:page="page"
+        :page-size="pageSize"
+        :total="batches.length"
+        class="border-t border-surface-border"
+      />
     </div>
 
     <div class="mt-3 text-xs text-ink-tertiary flex items-center gap-1.5">
