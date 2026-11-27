@@ -1,7 +1,7 @@
 # 版本管理与发版计划（VERSIONS）
 
 > 本文件是「田间智瞰」项目版本历史与发版计划的单一索引。
-> 2026-11-25 版本编号体系重构：旧桌面版本线 **v1.0.0 / v1.1.0 全部重置并入 V0.5.5 基线**；2026-11-24 的「无人机型号选择 + 地块地理位置」更新定为 **V0.5.6**；2026-11-25 的「数据处理模块风险收敛与长路径显示修复」定为 **V0.5.7**；2026-11-26 的「详情页/设置页布局对齐与存储路径快捷操作」定为 **V0.5.8**；2026-11-27 的「数据管理列表与详情页动态分页」定为 **V0.5.9（当前基线）**。历史文档（`docs/desktop-build-guide.md`、`.lqs/` 报告等）保留旧编号原文，以本文映射表对照，不回改。
+> 2026-11-25 版本编号体系重构：旧桌面版本线 **v1.0.0 / v1.1.0 全部重置并入 V0.5.5 基线**；2026-11-24 的「无人机型号选择 + 地块地理位置」更新定为 **V0.5.6**；2026-11-25 的「数据处理模块风险收敛与长路径显示修复」定为 **V0.5.7**；2026-11-26 的「详情页/设置页布局对齐与存储路径快捷操作」定为 **V0.5.8**；2026-11-27 的「数据管理列表与详情页动态分页」定为 **V0.5.9**；2026-11-27 的「移除新建数据集功能、收敛数据集管理为扫描载入+统一管理分析」定为 **V0.6.0（当前基线）**。历史文档（`docs/desktop-build-guide.md`、`.lqs/` 报告等）保留旧编号原文，以本文映射表对照，不回改。
 > 历史细节来源：`docs/prd/`（PRD v1~v7）、`docs/update_report/`（001~012）、`docs/bug_report/`（001~011）、`LOG.md`、git 提交树（追溯重构，V0.5.5 及以前版本号为回填编号，非当时实际发布号）。
 
 ---
@@ -30,7 +30,25 @@
 
 ## 二、版本历史（追溯重构）
 
-### V0.5.9 —— 当前基线（2026-11-27，桌面端与安装包已产出）
+### V0.6.0 —— 当前基线（2026-11-27，桌面端与安装包已产出）
+
+**主题：移除「新建数据集」功能，数据集管理收敛为扫描载入 + 统一管理分析（数据治理能力推迟独立立项）**
+
+- **决策**：正式移除【数据集管理】模块中「新建数据集」相关功能设定；当前版本仅提供**扫描载入已标注完备的数据集**（COCO/YOLO/VOC 格式识别、路径预检、原位导入注册），实现数据集资产的统一管理与统计分析。数据集构建、标注、质量评估、拆分与多格式导出推迟到后续专门版本，作为**「数据治理」模块**统一处理。与 PRD v6 的出入对照见 `docs/sdd/specs/2026-11-27-dataset-creation-removal-and-governance-deferral.md`。
+- **前端移除**：
+  - 删除 `DatasetNew.vue` 构建模式（4 步向导「基础信息/标注格式/拆分策略/目录结构预览」为纯 mock、提交禁用占位），页面重写为 `DatasetImport.vue`「载入数据集」，路由 `/dataset/dataset-new` → `/dataset/dataset-import`；
+  - `Datasets.vue` 删除「新建数据集」按钮（保留「载入数据集」），状态徽标删除「构建中」分支、来源列固定「导入」（后端 `source` 恒为 `imported`）；`DatasetDetail.vue` 同步清理；
+  - `Index.vue` 首页快速入口「构建数据集」→「载入数据集」，模块卡描述改为「统一管理与统计分析已标注完备的数据集资产」；
+  - `api/datasets.ts` 类型收窄：`DatasetSource = 'imported'`、`status = 'ready'`（移除 mock 时代 `'built' | 'building' | 'failed'`）。
+- **后端移除**：删除 `backend/mock/datasets.json`（V1 时代数据集 mock，自 V0.5.0 真实实现后无任何代码引用）；删除 `config.py` 死配置 `MOCK_DIR` / `MOCK_IMAGES_DIR`。后端 API 无需改动——`datasets_api.py` 本就无构建端点，扫描/导入即「扫描载入」能力，全部保留。
+- **测试**：后端全套 **186 passed**（未改后端逻辑，数量不变）；前端 `vue-tsc --noEmit && vite build` 通过。
+- **产物与验证**：
+  - 冻结后端载荷 `electron/backend-dist/TianJianZhiKanBackend/`：3,384 文件 / 851.5 MB；打包静态资源已含 `DatasetImport` 版 chunk，旧 `DatasetNew-*` chunk 随重建消失。
+  - 便携目录 `electron/dist/win-unpacked`：3,456 文件 / 1,119.4 MB，`TianJianZhiKan.exe` 文件版本 **0.6.0**。
+  - NSIS 安装包 `electron/dist/TianJianZhiKan-v0.6.0-win-x64-setup.exe`：382,878,586 B（365.1 MiB），SHA256 `763965809A67B5975EC472FAD9080A15488B0E7DB4E0F844C84015973DB33AA4`。
+  - 冒烟：开发态就绪 2.5s、health `v0.6.0`、11 模型、单图推理 2,954ms 成功（3 检出）；打包态（win-unpacked `--smoke`）就绪 2.9s、窗口可见 3.3s、health `v0.6.0`、推理 3,011ms 成功（3 检出）。
+
+### V0.5.9 ——（2026-11-27，桌面端与安装包已产出）
 
 **主题：数据管理列表与详情页动态分页（免滚动翻页浏览）**
 
@@ -179,7 +197,14 @@
 
 ## 三、发版计划
 
-### V0.5.9 发布清单（打包已完成，待提交/打 tag/推送）
+### V0.6.0 发布清单（打包已完成，待提交/打 tag/推送）
+
+1. 冻结验证：`cd backend; python -m pytest -q` 全绿（186 passed）→ `cd frontend; npm run build` 通过 → `electron\build-backend.ps1 -PythonExe C:\Users\lqs\UAVDesktopBuild\venv\Scripts\python.exe` 重建载荷 → 开发态与打包态 `npm run smoke` 均通过（health `v0.6.0`）。
+2. 版本号已升至 `0.6.0`（`electron/package.json` 单一来源，`backend/config.py` 回退默认值同步），本文件已更新。
+3. 产物已产出：`npm run build:dir` → `win-unpacked`（3,456 文件 / 1,119.4 MB，exe 文件版本 0.6.0）；`npm run build:installer` → `TianJianZhiKan-v0.6.0-win-x64-setup.exe`（382,878,586 B / 365.1 MiB，SHA256 `763965809A67B5975EC472FAD9080A15488B0E7DB4E0F844C84015973DB33AA4`）。
+4. 待执行：提交（V0.5.9 清单中的提交/tag/推送步骤一并并入本版执行，首个 tag 改为 `v0.6.0`）→ 打注解 tag `v0.6.0` → 按 AGENTS.md Git 工作流走本地系统代理推送 → `gh release create v0.6.0` 上传安装包（Release notes 注明未签名 SmartScreen「更多信息 → 仍要运行」）。
+
+### V0.5.9 发布清单（打包已完成；提交/tag/推送步骤并入上方 V0.6.0 清单执行）
 
 1. 冻结验证：`cd backend; python -m pytest -q` 全绿（186 passed）→ `cd frontend; npm run build` → `electron\build-backend.ps1 -PythonExe C:\Users\lqs\UAVDesktopBuild\venv\Scripts\python.exe` 重建载荷（3,384 文件 / 851.5 MB）→ 开发态与打包态 `npm run smoke` 均通过（health `v0.5.9`）。
 2. 版本号已升至 `0.5.9`（`electron/package.json` 单一来源，`backend/config.py` 回退默认值同步），本文件已更新。
@@ -201,5 +226,5 @@
 | 版本 | 主题 | 依据 |
 |---|---|---|
 | V0.5.x 补丁 | zip target/artifactName 配置落地；桌面自动更新评估；发布产物 CI 化 | 报告 012（已规划未实施） |
-| V0.6.0 | 数据集管理二阶段：数据集构建/拆分/多格式导出（「新建数据集」构建 tab 启用） | README「V4 第二阶段」、PRD v6 第四章 |
+| 数据治理模块（独立立项，版本号另定） | 数据集构建/标注/质量评估、拆分与多格式导出（原 V0.6.0 数据集二阶段规划移入） | `docs/sdd/specs/2026-11-27-dataset-creation-removal-and-governance-deferral.md` |
 | V1.0.0 | 四模块全量完成、文档/测试/安装包齐备后的正式对外版本 | 本文件编号规范 |

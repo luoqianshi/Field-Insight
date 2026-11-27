@@ -29,10 +29,7 @@ function formatCount(key: string): number {
 function statusBadge(status: string): { cls: string; label: string } {
   const s = (status || '').toLowerCase()
   if (s.includes('ready')) return { cls: 'badge-success', label: '已就绪' }
-  if (s.includes('publish') || s.includes('发布')) return { cls: 'badge-success', label: '已发布' }
-  if (s.includes('build') || s.includes('构建') || s.includes('process')) return { cls: 'badge-running', label: '构建中' }
   if (s.includes('fail')) return { cls: 'badge-pending', label: '失败' }
-  if (s.includes('draft') || s.includes('草稿')) return { cls: 'badge-pending', label: '草稿' }
   return { cls: 'badge-info', label: status || '—' }
 }
 
@@ -41,10 +38,6 @@ function splitRatio(d: Dataset): string {
   if (!total) return '—'
   if (!d.test_count) return `${d.train_count}:${d.val_count}`
   return `${d.train_count}:${d.val_count}:${d.test_count}`
-}
-
-function sourceLabel(s: string): string {
-  return s === 'built' ? '构建' : '导入'
 }
 
 async function applyFilter(fmt?: string) {
@@ -70,11 +63,8 @@ onMounted(() => applyFilter())
         <p class="text-sm text-ink-secondary mt-1">甘蔗幼苗数据集 · 单个数据集仅管理一种标注格式</p>
       </div>
       <div class="flex gap-2">
-        <router-link to="/dataset/dataset-new" class="px-4 py-2 bg-brand-700 hover:bg-brand-900 text-white rounded-btn text-sm font-medium inline-flex items-center gap-2">
-          <i class="fa-solid fa-file-import text-xs"></i> 导入数据集
-        </router-link>
-        <router-link to="/dataset/dataset-new" class="px-4 py-2 bg-white border border-surface-border hover:bg-surface-hover text-ink-primary rounded-btn text-sm font-medium inline-flex items-center gap-2">
-          <i class="fa-solid fa-plus text-xs"></i> 新建数据集
+        <router-link to="/dataset/dataset-import" class="px-4 py-2 bg-brand-700 hover:bg-brand-900 text-white rounded-btn text-sm font-medium inline-flex items-center gap-2">
+          <i class="fa-solid fa-file-import text-xs"></i> 载入数据集
         </router-link>
       </div>
     </div>
@@ -163,7 +153,7 @@ onMounted(() => applyFilter())
             </td>
             <td class="py-3 px-5 text-ink-secondary text-xs">{{ d.version }}</td>
             <td class="py-3 px-5"><span :class="formatTagStyle(d.format).cls" :style="formatTagStyle(d.format).style">{{ d.format === 'VOC' ? 'Pascal VOC' : d.format }}</span></td>
-            <td class="py-3 px-5"><span class="tag" :class="d.source === 'built' ? 'tag-blue' : ''">{{ sourceLabel(d.source) }}</span></td>
+            <td class="py-3 px-5"><span class="tag">导入</span></td>
             <td class="text-right py-3 px-5 text-ink-primary">{{ d.sample_count.toLocaleString() }}</td>
             <td class="text-right py-3 px-5 text-ink-secondary">{{ d.object_count.toLocaleString() }}</td>
             <td class="py-3 px-5">

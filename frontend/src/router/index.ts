@@ -19,7 +19,7 @@ const routes = [
   // 数据集管理
   { path: '/dataset/datasets', name: 'datasets', component: () => import('@/views/dataset/Datasets.vue') },
   { path: '/dataset/datasets/:id', name: 'dataset-detail', component: () => import('@/views/dataset/DatasetDetail.vue') },
-  { path: '/dataset/dataset-new', name: 'dataset-new', component: () => import('@/views/dataset/DatasetNew.vue') },
+  { path: '/dataset/dataset-import', name: 'dataset-import', component: () => import('@/views/dataset/DatasetImport.vue') },
 
   // 算法广场
   { path: '/algo/models', name: 'models', component: () => import('@/views/algo/Models.vue') },

@@ -2,7 +2,7 @@ import client from './client'
 import { nativePickFolder } from './desktop'
 
 export type DatasetFormat = 'YOLO' | 'COCO' | 'VOC'
-export type DatasetSource = 'imported' | 'built'
+export type DatasetSource = 'imported'
 
 export interface DatasetSplit { image_count: number; object_count: number }
 
@@ -21,7 +21,7 @@ export interface Dataset {
   version: string
   description: string
   created_at: string
-  status: 'ready' | 'building' | 'failed'
+  status: 'ready'
   // 兼容旧模板的派生字段
   id: string
   sample_count: number

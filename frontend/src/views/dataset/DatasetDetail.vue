@@ -42,7 +42,6 @@ let sizeChart: echarts.ECharts | null = null
 function statusBadge(status: string): { cls: string; label: string } {
   const s = (status || '').toLowerCase()
   if (s.includes('ready')) return { cls: 'badge-success', label: '已就绪' }
-  if (s.includes('build')) return { cls: 'badge-running', label: '构建中' }
   if (s.includes('fail')) return { cls: 'badge-pending', label: '失败' }
   return { cls: 'badge-info', label: status || '—' }
 }
@@ -54,9 +53,6 @@ function formatTagStyle(fmt: string) {
 }
 function formatLabel(fmt: string) {
   return fmt === 'VOC' ? 'Pascal VOC' : fmt
-}
-function sourceLabel(s: string) {
-  return s === 'built' ? '构建' : '导入'
 }
 
 // 目录树（按格式示意）
@@ -339,7 +335,7 @@ onBeforeUnmount(() => {
             <span class="badge" :class="statusBadge(dataset.status).cls">{{ statusBadge(dataset.status).label }}</span>
             <span class="tag tag-green">目标检测</span>
             <span :class="formatTagStyle(dataset.format).cls" :style="formatTagStyle(dataset.format).style">{{ formatLabel(dataset.format) }}</span>
-            <span class="tag" :class="dataset.source === 'built' ? 'tag-blue' : ''">{{ sourceLabel(dataset.source) }}</span>
+            <span class="tag">导入</span>
           </div>
           <p class="text-sm text-ink-secondary mt-1">{{ formatLabel(dataset.format) }} 单一格式 · {{ dataset.image_size || '—' }} · 创建于 {{ dataset.created_at }}</p>
         </div>
@@ -414,7 +410,7 @@ onBeforeUnmount(() => {
               <div class="flex justify-between"><span class="text-ink-tertiary">版本</span><span class="text-ink-primary font-medium">{{ dataset.version || '—' }}</span></div>
               <div class="flex justify-between"><span class="text-ink-tertiary">任务类型</span><span class="text-ink-primary">目标检测</span></div>
               <div class="flex justify-between"><span class="text-ink-tertiary">标注格式</span><span class="text-ink-primary">{{ formatLabel(dataset.format) }}（单一）</span></div>
-              <div class="flex justify-between"><span class="text-ink-tertiary">来源</span><span class="text-ink-primary">{{ sourceLabel(dataset.source) }}</span></div>
+              <div class="flex justify-between"><span class="text-ink-tertiary">来源</span><span class="text-ink-primary">导入</span></div>
               <div class="flex justify-between"><span class="text-ink-tertiary">类别数</span><span class="text-ink-primary">{{ (dataset.classes || []).length }}</span></div>
               <div class="flex justify-between"><span class="text-ink-tertiary">原图数</span><span class="text-ink-primary">{{ dataset.origin_image_count || 0 }}</span></div>
               <div class="flex justify-between"><span class="text-ink-tertiary">分辨率</span><span class="text-ink-primary">{{ dataset.image_size || '—' }}</span></div>

@@ -44,9 +44,9 @@ def _app_version() -> str:
         return env_version
     try:
         pkg = Path(__file__).resolve().parent.parent / "electron" / "package.json"
-        return json.loads(pkg.read_text(encoding="utf-8")).get("version") or "0.5.9"
+        return json.loads(pkg.read_text(encoding="utf-8")).get("version") or "0.6.0"
     except Exception:
-        return "0.5.9"
+        return "0.6.0"
 
 
 APP_VERSION = _app_version()
@@ -105,8 +105,6 @@ MODELS_DIR = PROJECT_ROOT / "models"
 # config/ 特例（决策 D5）：非冻结态为 git 跟踪的模板目录（RESOURCE_ROOT==PROJECT_ROOT），不随数据根迁移
 CONFIG_DIR = (PROJECT_ROOT / "config") if FROZEN else (DEFAULT_ROOT / "config")
 RESULTS_DIR = PROJECT_ROOT / "results"
-MOCK_DIR = BACKEND_DIR / "mock"
-MOCK_IMAGES_DIR = RESOURCE_ROOT / "mock"
 STATIC_DIR = BACKEND_DIR / "static"
 MODELS_YAML = CONFIG_DIR / "models.yaml"
 

@@ -189,7 +189,7 @@ onMounted(() => {
             <div class="text-xs text-ink-tertiary">阶段 3</div>
           </div>
           <div class="text-sm font-semibold text-ink-primary">数据集管理</div>
-          <div class="text-xs text-ink-tertiary mt-1">消费外部标注，拆分构建与多格式导出</div>
+          <div class="text-xs text-ink-tertiary mt-1">统一管理与统计分析已标注完备的数据集资产</div>
           <div class="text-xs text-brand-700 mt-2 font-medium">
             {{ datasetsStore.total }} 个数据集 · {{ totalSamples.toLocaleString() }} 样本
           </div>
@@ -259,7 +259,7 @@ onMounted(() => {
               </div>
             </router-link>
             <router-link
-              to="/dataset/dataset-new"
+              to="/dataset/dataset-import"
               class="border border-surface-border rounded-card p-4 hover:border-brand-300 hover:bg-brand-50/30 transition flex items-start gap-3"
             >
               <div
@@ -268,8 +268,8 @@ onMounted(() => {
                 <Icon name="database" :size="18" />
               </div>
               <div class="min-w-0">
-                <div class="text-sm font-semibold text-ink-primary">构建数据集</div>
-                <div class="text-xs text-ink-tertiary mt-0.5">拆分 train/val/test 与多格式导出</div>
+                <div class="text-sm font-semibold text-ink-primary">载入数据集</div>
+                <div class="text-xs text-ink-tertiary mt-0.5">扫描并载入已标注完备的数据集</div>
               </div>
             </router-link>
             <router-link

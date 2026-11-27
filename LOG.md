@@ -57,3 +57,5 @@
 - [2026-11-27 15:57] feat(data): 数据管理列表动态分页（新增 useAdaptivePagination 与 PaginationBar，接入原始架次/加工数据列表页），超出行数切换底部分页免滚动浏览，前端已重新构建
 - [2026-11-27 16:11] refactor(data): 架次详情与加工数据详情图片由「加载更多」累积改为底部分页条翻页（复用 PaginationBar，单页仅保留当前页数据），前端已重新构建
 - [2026-11-27 16:45] build(desktop): 版本升至 0.5.9 并产出 Electron 便携目录（3,457 文件/1,119.5MB）与 NSIS 安装包（SHA256 CDDD0016…9C56），pytest 186 passed、开发态与打包态冒烟通过，VERSIONS.md 同步 V0.5.9
+- [2026-11-27 18:10] feat(dataset): 移除「新建数据集」功能——DatasetNew 构建向导删除改为 DatasetImport 载入页（路由 dataset-new→dataset-import），列表/详情/首页入口与类型收窄清理，删除 backend/mock/datasets.json 与 config 死配置 MOCK_DIR/MOCK_IMAGES_DIR，PRD 出入说明归档 docs/sdd/specs/2026-11-27
+- [2026-11-27 18:10] build(desktop): 版本升至 0.6.0 并产出 Electron 便携目录（3,456 文件/1,119.4MB）与 NSIS 安装包（382,878,586 B，SHA256 76396580…33AA4），pytest 186 passed、前端构建、开发态与打包态冒烟通过（health v0.6.0），VERSIONS.md 同步 V0.6.0
