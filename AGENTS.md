@@ -124,10 +124,10 @@ npm run build:installer                   # → dist/TianJianZhiKan-v{version}-w
 
 ### 发布约定
 - 版本单一来源：`electron/package.json` 的 `version`；git tag `vX.Y.Z`（注解 tag）与之对齐。
-- 仅发布 Windows 压缩包 `TianJianZhiKan-v{version}-win-x64.zip`；`dist/win-unpacked` 是免安装原材料，整目录压缩，不逐个挑 exe。
+- 发布三件套：便携 zip `TianJianZhiKan-v{version}-win-x64.zip`（`dist/win-unpacked` 是免安装原材料，整目录压缩，不逐个挑 exe）、NSIS 安装包 `TianJianZhiKan-v{version}-win-x64-setup.exe`、`SHA256SUMS.txt` 校验清单；Release notes 原文归档 `docs/releases/v{version}.md`，`gh release create --notes-file` 引用。
 - `publish: null` 手动发布、无自动更新；zip target/artifactName 配置已规划未实施（见 `docs/update_report/012`）；NSIS 安装包（向导式/自定义目录/当前用户/桌面与开始菜单快捷方式）自 v1.1.0 起可用 `npm run build:installer` 产出，验证与构建说明见 [docs/desktop-build-guide.md](docs/desktop-build-guide.md)。
 - 未代码签名：SmartScreen「未知发布者」属预期，Release notes 须写明「更多信息 → 仍要运行」。
-- 流程：冻结验证（pytest/build/smoke）→ 版本提交 → 重建产物链 → 干净目录解压验证 + SHA256 → 注解 tag → 按 Git 工作流走代理推送 → `gh release create` 上传 zip + sha256。
+- 流程：冻结验证（pytest/build/smoke）→ 版本提交 → 重建产物链 → 干净目录解压验证 + SHA256 → 注解 tag → 按 Git 工作流走代理推送 → `gh release create` 上传 zip + 安装包 + SHA256SUMS → 回写 VERSIONS.md 发布状态与 LOG.md。
 
 ### 环境与操作禁忌
 - D:\ 根目录有写保护：构建/安装输出放用户目录、`%TEMP%` 或项目外 build 目录；中间产物不得污染仓库根。
